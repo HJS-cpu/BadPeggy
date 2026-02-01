@@ -5,6 +5,7 @@
 Bad Peggy ist ein Fork des Original-Projekts von coderslagoon. Das Original-Repository existiert nicht mehr auf GitHub.
 
 - **Repository:** https://github.com/HJS-cpu/BadPeggy
+- **Website:** http://hjs.bplaced.net/BadPeggy
 - **Aktuelle Version:** 2.4
 - **Java Version:** 17 (OpenJDK Temurin)
 - **Build System:** Maven
@@ -41,6 +42,7 @@ mvn clean package -DskipTests -Dswt.artifactId=org.eclipse.swt.win32.win32.x86_6
 
 ### GitHub Actions
 - Build wird automatisch ausgelöst bei Push auf `master`
+- **Manueller Trigger:** `workflow_dispatch` - Build kann über Actions-Seite gestartet werden
 - Workflow: `.github/workflows/build.yml`
 - Artifacts verfügbar unter: https://github.com/HJS-cpu/BadPeggy/actions
 
@@ -71,6 +73,13 @@ Neue Strings müssen in beiden Sprachen hinzugefügt werden:
 - `src/coderslagoon/badpeggy/NLS_en.properties`
 
 ## Session-Historie
+
+### 2026-02-01
+- **Website-URL geändert:** `PRODUCT_SITE` auf `http://hjs.bplaced.net/BadPeggy` aktualisiert
+- **onWebsite Listener vereinfacht:** Query-Parameter entfernt, Code von 19 auf 9 Zeilen reduziert
+- **workflow_dispatch hinzugefügt:** Manuelle Builds über GitHub Actions möglich
+- **README.md Badges:** Build-Status und Website-Badge hinzugefügt
+- **Website-Projekt ausgelagert:** Separates Projekt unter `C:\Users\HJS\Claude.ai\BadPeggy Website`
 
 ### 2025-02-01
 - **Open Folder verbessert:** Datei wird jetzt im Explorer/Finder markiert statt nur den Ordner zu öffnen
