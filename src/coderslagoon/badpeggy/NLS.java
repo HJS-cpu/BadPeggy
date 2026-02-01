@@ -19,6 +19,7 @@ public class NLS extends com.coderslagoon.baselib.util.NLS {
     public static Str GUI_MN_HELP_ABOUT;
     public static Str GUI_PMN_DELETE;
     public static Str GUI_PMN_MOVE;
+    public static Str GUI_PMN_OPENFOLDER;
     public static Str GUI_PMN_CLEAR;
     public static Str GUI_PMN_SELECTALL;
     public static Str GUI_PMN_EXPORTLIST;

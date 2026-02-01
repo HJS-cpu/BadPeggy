@@ -95,7 +95,7 @@ import com.coderslagoon.baselib.util.VarRef;
 public class GUI implements Runnable, NLS.Reg.Listener {
     final static String PROPERTIES = "badpeggy";
 
-    final static String VERSION = "2.3";
+    final static String VERSION = "2.4";
 
     final static int DLG_GAP = 10;
 
@@ -144,6 +144,7 @@ public class GUI implements Runnable, NLS.Reg.Listener {
     MenuItem    mniAbout;
     MenuItem    mniDelete;
     MenuItem    mniMove;
+    MenuItem    mniOpenFolder;
     MenuItem    mniExportList;
     MenuItem    mniSelectAll;
     MenuItem    mniClear;
@@ -283,6 +284,8 @@ public class GUI implements Runnable, NLS.Reg.Listener {
         this.mniDelete.addListener(SWT.Selection, this.onDelete);
         this.mniMove = new MenuItem(this.popupMenu, SWT.NONE);
         this.mniMove.addListener(SWT.Selection, this.onMove);
+        this.mniOpenFolder = new MenuItem(this.popupMenu, SWT.NONE);
+        this.mniOpenFolder.addListener(SWT.Selection, this.onOpenFolder);
         new MenuItem(this.popupMenu, SWT.SEPARATOR);
         this.mniSelectAll = new MenuItem(this.popupMenu, SWT.NONE);
         this.mniSelectAll.addListener(SWT.Selection, this.onSelectAll);
@@ -397,6 +400,7 @@ public class GUI implements Runnable, NLS.Reg.Listener {
         this.mniAbout         .setText(NLS.GUI_MN_HELP_ABOUT         .s());
         this.mniDelete        .setText(NLS.GUI_PMN_DELETE            .s());
         this.mniMove          .setText(NLS.GUI_PMN_MOVE              .s());
+        this.mniOpenFolder    .setText(NLS.GUI_PMN_OPENFOLDER        .s());
         this.mniClear         .setText(NLS.GUI_PMN_CLEAR             .s());
         this.mniSelectAll     .setText(NLS.GUI_PMN_SELECTALL         .s());
         this.mniExportList    .setText(NLS.GUI_PMN_EXPORTLIST        .s());
@@ -857,6 +861,22 @@ public class GUI implements Runnable, NLS.Reg.Listener {
                     NLS.GUI_DLG_GENERIC_WARNING.s());
             }
             finalizeRemoval(moved);
+        }
+    };
+
+    Listener onOpenFolder = new Safe.Listener() {
+        protected void unsafeHandleEvent(Event evt) {
+            int c = GUI.this.badLst.getSelectionCount();
+            if (0 == c) {
+                return;
+            }
+            int idx = GUI.this.badLst.getSelectionIndex();
+            ImageScanner.Result res = GUI.this.results.get(idx);
+            File fl = new File(res.tag.toString());
+            File folder = fl.getParentFile();
+            if (folder != null && folder.exists()) {
+                Program.launch(folder.getAbsolutePath());
+            }
         }
     };
 
