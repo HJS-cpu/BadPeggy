@@ -1,6 +1,6 @@
 # Bad Peggy (Fork)
 
-> **This is a fork of [Bad Peggy](https://github.com/coderslagoon/badpeggy) by [coderslagoon](https://github.com/coderslagoon) with additional features and improvements.**
+> **This is a fork of Bad Peggy by coderslagoon with additional features and improvements.**
 
 Bad Peggy scans JPEG and other image formats for damage and other blemishes and shows
 the results and images instantly. It allows you to find such broken files quickly,
