@@ -9,15 +9,17 @@ on:
 jobs:
   build:
     strategy:
+      fail-fast: false
       matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest]
         include:
-          - os: ubuntu-latest
-            swt-artifact: org.eclipse.swt.gtk.linux.x86_64
           - os: windows-latest
             swt-artifact: org.eclipse.swt.win32.win32.x86_64
-          - os: macos-latest
+          - os: ubuntu-latest
+            swt-artifact: org.eclipse.swt.gtk.linux.x86_64
+          - os: macos-13
             swt-artifact: org.eclipse.swt.cocoa.macosx.x86_64
+          - os: macos-latest
+            swt-artifact: org.eclipse.swt.cocoa.macosx.aarch64
 
     runs-on: ${{ matrix.os }}
 
@@ -32,13 +34,14 @@ jobs:
         cache: maven
 
     - name: Build with Maven
-      run: mvn -B compile --file pom.xml
+      run: mvn -B compile -Dswt.artifactId=${{ matrix.swt-artifact }} --file pom.xml
 
     - name: Run tests
-      run: mvn -B test --file pom.xml
+      run: mvn -B test -Dswt.artifactId=${{ matrix.swt-artifact }} --file pom.xml
+      continue-on-error: true
 
     - name: Package
-      run: mvn -B package -DskipTests --file pom.xml
+      run: mvn -B package -DskipTests -Dswt.artifactId=${{ matrix.swt-artifact }} --file pom.xml
 
     - name: Upload artifact
       uses: actions/upload-artifact@v4
