@@ -60,6 +60,9 @@ mvn clean package -DskipTests -Dswt.artifactId=org.eclipse.swt.win32.win32.x86_6
 | `NLS_en.properties` | Englische Übersetzungen |
 | `ImageScanner.java` | Bild-Scan-Logik |
 | `pom.xml` | Maven Build-Konfiguration |
+| `README.md` | Projekt-Dokumentation mit Screenshot |
+| `Bad Peggy.png` | Screenshot für README (400px) |
+| `create_release_zip.cmd` | Skript zum Erstellen des Release-ZIPs |
 
 ## Internationalisierung (I18N)
 
@@ -71,5 +74,9 @@ Neue Strings müssen in beiden Sprachen hinzugefügt werden:
 
 ### 2025-02-01
 - **Open Folder verbessert:** Datei wird jetzt im Explorer/Finder markiert statt nur den Ordner zu öffnen
-- **README.md aktualisiert:** Fork-Hinweis, Feature-Liste, Build-Anleitung
+- **README.md aktualisiert:** Fork-Hinweis, Feature-Liste, Build-Anleitung hinzugefügt
+- **README.md Screenshot:** `Bad Peggy.png` mit 400px Breite eingebunden
 - **Release-Skript erstellt:** `create_release_zip.cmd` für saubere ZIP-Verteilung
+  - Kopiert alle benötigten Dateien (JAR, JRE, Libs, alle TXT-Dateien)
+  - Schließt `badpeggy_old.jar` und `badpeggy.properties` aus
+  - Erstellt `BadPeggy_Windows_x64.zip`
