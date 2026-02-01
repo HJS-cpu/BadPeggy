@@ -169,7 +169,7 @@ public class GUI implements Runnable, NLS.Reg.Listener {
     }
 
     final static String PRODUCT_NAME = "Bad Peggy";
-    public final static String PRODUCT_SITE = "https://coderslagoon.com/product";
+    public final static String PRODUCT_SITE = "http://hjs.bplaced.net/BadPeggy";
     
     final static int EXITCODE_UNRECERR = 1;
 
@@ -520,22 +520,12 @@ public class GUI implements Runnable, NLS.Reg.Listener {
 
     Listener onWebsite = new Safe.Listener() {
         protected void unsafeHandleEvent(Event evt) {
-            try {
-                String pname = PRODUCT_NAME.toLowerCase().replace(" ", "");
-                String url = PRODUCT_SITE + 
-                    "?version=" + URLEncoder.encode(VERSION, "UTF-8") +
-                    "&name=" + pname +
-                    "&lang=" + com.coderslagoon.baselib.util.NLS.Reg.instance().id().toLowerCase();
-                if (Program.launch(url)) {
-                    return;
-                }
+            if (!Program.launch(PRODUCT_SITE)) {
+                MessageBox2.standard(GUI.this.shell,
+                        SWT.ICON_WARNING | SWT.OK,
+                        NLS.GUI_MSGBOX_WEBSITE_1.fmt(PRODUCT_SITE),
+                        PRODUCT_NAME);
             }
-            catch (Throwable ignored) {
-            }
-            MessageBox2.standard(GUI.this.shell,
-                    SWT.ICON_WARNING | SWT.OK,
-                    NLS.GUI_MSGBOX_WEBSITE_1.fmt(PRODUCT_SITE),
-                    PRODUCT_NAME);
         }
     };
 
