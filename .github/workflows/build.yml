@@ -16,8 +16,6 @@ jobs:
             swt-artifact: org.eclipse.swt.win32.win32.x86_64
           - os: ubuntu-latest
             swt-artifact: org.eclipse.swt.gtk.linux.x86_64
-          - os: macos-13
-            swt-artifact: org.eclipse.swt.cocoa.macosx.x86_64
           - os: macos-latest
             swt-artifact: org.eclipse.swt.cocoa.macosx.aarch64
 
