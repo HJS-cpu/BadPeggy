@@ -1,5 +1,7 @@
 # Bad Peggy (Fork)
 
+<img src="Bad Peggy.png" width="400" alt="Bad Peggy Screenshot">
+
 > **This is a fork of Bad Peggy by coderslagoon with additional features and improvements.**
 
 Bad Peggy scans JPEG and other image formats for damage and other blemishes and shows
