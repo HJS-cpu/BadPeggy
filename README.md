@@ -1,25 +1,62 @@
-# Bad Peggy
+# Bad Peggy (Fork)
+
+> **This is a fork of [Bad Peggy](https://github.com/coderslagoon/badpeggy) by [coderslagoon](https://github.com/coderslagoon) with additional features and improvements.**
 
 Bad Peggy scans JPEG and other image formats for damage and other blemishes and shows
 the results and images instantly. It allows you to find such broken files quickly,
 inspect and then either delete or move them to a different location.
 
-Implemented in Java 8 and SWT. Runs on Windows, MacOS and Linux.
+Runs on Windows, macOS and Linux.
+
+## Changes in this Fork
+
+### New Features
+- **Open Folder**: Right-click context menu option to open the file location
+- **File Selection**: When opening folder, the file is now highlighted/selected in Explorer (Windows) or Finder (macOS)
+
+### Improvements
+- Updated to **Java 17**
+- **Maven build system** for easier building
+- **GitHub Actions CI/CD**: Automatic builds for Windows, Linux, and macOS (ARM64)
+- Performance optimizations
+- Fixed signature file exclusion in shaded JAR
+
+## Download
+
+Pre-built binaries are available under [Releases](https://github.com/HJS-cpu/BadPeggy/releases) or as build artifacts from [GitHub Actions](https://github.com/HJS-cpu/BadPeggy/actions).
+
+---
 
 ## Development
 
-BadPeggy development is done in Eclipse (Photon+). Choose the right SWT project
-for your platform, and import it into your workspace. It will show up as
-*org.clipse.swt*. On Linux for instance it would be
-*swt/4.8/gtk-linux_x86_64/*. You also need the library CLBaseLib, which you can
-clone from GitHub and import its Eclipse project.
+### Building with Maven
+
+```bash
+# Build for your platform
+mvn clean package -DskipTests
+
+# Build for specific platform (e.g., Windows)
+mvn clean package -DskipTests -Dswt.artifactId=org.eclipse.swt.win32.win32.x86_64
+```
+
+**Supported SWT artifacts:**
+- Windows: `org.eclipse.swt.win32.win32.x86_64`
+- Linux: `org.eclipse.swt.gtk.linux.x86_64`
+- macOS (ARM): `org.eclipse.swt.cocoa.macosx.aarch64`
+
+### Eclipse Development
+
+BadPeggy development can also be done in Eclipse. Choose the right SWT project
+for your platform, and import it into your workspace. You also need the library
+[CLBaseLib](https://github.com/coderslagoon/CLBaseLib), which you can clone from GitHub.
 
 You can then run Bad Peggy by debugging the class *coderslagoon.badpeggy.GUI*.
 
-For verification the few test cases can also be executed. Notice though that
-they might fail due to slightly different image rendering of the test material.
-This does usually not present a problem. Frozen reference test material is not
-included, due to the huge size of it (3+GB).
+### Tests
+
+The test cases can be executed, though they might fail due to slightly different
+image rendering of the test material. This does usually not present a problem.
+Frozen reference test material is not included, due to the huge size of it (3+GB).
 
 ## Shipping
 
