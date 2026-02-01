@@ -26,14 +26,15 @@ public class GUIProps {
     public final static Prp.Str  SET_LANG            = new Prp.Str (GUI_SET_PFX  + "lang", null);
 
     private static String makeFileExtensionList() {
-        String result = "";
-        String comma = "";
+        StringBuilder result = new StringBuilder();
         for (ImageFormat ifmt : ImageFormat.values()) {
             for (String ext : ifmt.extensions) {
-                result += comma + ext;
-                comma = ",";
+                if (result.length() > 0) {
+                    result.append(',');
+                }
+                result.append(ext);
             }
         }
-        return result;
+        return result.toString();
     }
 }

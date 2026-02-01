@@ -15,9 +15,10 @@ import java.util.Calendar;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.HashSet;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -117,7 +118,8 @@ public class GUI implements Runnable, NLS.Reg.Listener {
     AtomicBoolean     esc   = new AtomicBoolean();
     AtomicBoolean     close = new AtomicBoolean();
 
-    List<ImageScanner.Result> results  = new LinkedList<>();
+    List<ImageScanner.Result> results  = new ArrayList<>();
+    Set<Object> resultTags = new HashSet<>();
 
     Display     display;
     Shell       shell;
@@ -156,6 +158,9 @@ public class GUI implements Runnable, NLS.Reg.Listener {
     boolean      draggingOut;
 
     ShellProps   shellProps;
+
+    // Color cache to avoid memory leaks from repeated Color allocations
+    Map<Integer, Color> colorCache = new HashMap<>();
 
     static File _propertiesFile;
     static {
@@ -372,6 +377,7 @@ public class GUI implements Runnable, NLS.Reg.Listener {
         for (File fl : GUI.this.manualFiles.values()) {
             fl.delete();
         }
+        disposeColorCache();
     }
 
     @Override
@@ -660,16 +666,28 @@ public class GUI implements Runnable, NLS.Reg.Listener {
                   .replaceAll("\\ [0-9]+"         , "");
     }
 
+    Color getCachedColor(int rgb) {
+        return colorCache.computeIfAbsent(rgb,
+            k -> new Color(this.display, (k >> 16) & 0xFF, (k >> 8) & 0xFF, k & 0xFF));
+    }
+
+    void disposeColorCache() {
+        for (Color c : colorCache.values()) {
+            if (!c.isDisposed()) c.dispose();
+        }
+        colorCache.clear();
+    }
+
     void differentiate(TableItem ti, String msg) {
         String msg2 = normalizeMessage(msg);
-        int v = msg2.toString().hashCode();
+        int v = msg2.hashCode();
         int r =  v & 0x00000ff;
         int g = (v & 0x000ff00) >>  8;
         int b = (v & 0x0ff0000) >> 16;
         int f = (r + g*2 + b) > (127 * 4) ? 0 : 255;
         int c = (int)(r * .299 + g * .587 + b * .114);
-        ti.setBackground(new Color(GUI.this.display, c, c, c));
-        ti.setForeground(new Color(GUI.this.display, f, f, f));
+        ti.setBackground(getCachedColor((c << 16) | (c << 8) | c));
+        ti.setForeground(getCachedColor((f << 16) | (f << 8) | f));
     }
 
     Listener onSetData = new Safe.Listener() {
@@ -862,6 +880,7 @@ public class GUI implements Runnable, NLS.Reg.Listener {
             GUI.this.info.setText("");
         }
         GUI.this.results.clear();
+        GUI.this.resultTags.clear();
         reset();
     }
 
@@ -1007,14 +1026,15 @@ public class GUI implements Runnable, NLS.Reg.Listener {
     }
 
     void finalizeRemoval(List<ImageScanner.Result> todel) {
+        File viewedFile = this.imgViewer.file();
         for (ImageScanner.Result res : todel) {
-            this.results.remove(res);
-            File viewedFile = this.imgViewer.file();
-            if (null != viewedFile &&
-                res.tag.equals(viewedFile.getAbsolutePath())) {
+            this.resultTags.remove(res.tag);
+            if (null != viewedFile && res.tag.equals(viewedFile.getAbsolutePath())) {
                 this.imgViewer.setFile(null);
+                viewedFile = null;
             }
         }
+        this.results.removeAll(todel);
         reset();
     }
 
@@ -1326,11 +1346,8 @@ public class GUI implements Runnable, NLS.Reg.Listener {
     }
 
     boolean addResult(ImageScanner.Result res) {
-        final Object tag = res.tag;
-        for (ImageScanner.Result res2 : this.results) {
-            if (res2.tag.equals(tag)) {
-                return false;
-            }
+        if (!this.resultTags.add(res.tag)) {
+            return false;
         }
         this.results.add(res);
         return true;
