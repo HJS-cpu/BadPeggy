@@ -873,9 +873,32 @@ public class GUI implements Runnable, NLS.Reg.Listener {
             int idx = GUI.this.badLst.getSelectionIndex();
             ImageScanner.Result res = GUI.this.results.get(idx);
             File fl = new File(res.tag.toString());
-            File folder = fl.getParentFile();
-            if (folder != null && folder.exists()) {
-                Program.launch(folder.getAbsolutePath());
+            if (fl.exists()) {
+                try {
+                    if (System.getProperty("os.name").toLowerCase().contains("win")) {
+                        // Windows: Open Explorer and select the file
+                        Runtime.getRuntime().exec(new String[] {
+                            "explorer", "/select,", fl.getAbsolutePath()
+                        });
+                    } else if (MiscUtils.underOSX()) {
+                        // macOS: Open Finder and select the file
+                        Runtime.getRuntime().exec(new String[] {
+                            "open", "-R", fl.getAbsolutePath()
+                        });
+                    } else {
+                        // Linux/other: Just open the parent folder
+                        File folder = fl.getParentFile();
+                        if (folder != null && folder.exists()) {
+                            Program.launch(folder.getAbsolutePath());
+                        }
+                    }
+                } catch (IOException ioe) {
+                    // Fallback: open parent folder
+                    File folder = fl.getParentFile();
+                    if (folder != null && folder.exists()) {
+                        Program.launch(folder.getAbsolutePath());
+                    }
+                }
             }
         }
     };
