@@ -6,22 +6,17 @@ on:
   pull_request:
     branches: [ main, master ]
   workflow_dispatch:
+    inputs:
+      all_platforms:
+        description: 'Build for all platforms (Windows, Linux, macOS)'
+        required: false
+        default: false
+        type: boolean
 
 jobs:
-  build:
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - os: windows-latest
-            swt-artifact: org.eclipse.swt.win32.win32.x86_64
-          - os: ubuntu-latest
-            swt-artifact: org.eclipse.swt.gtk.linux.x86_64
-          - os: macos-latest
-            swt-artifact: org.eclipse.swt.cocoa.macosx.aarch64
-
-    runs-on: ${{ matrix.os }}
-
+  # Windows Build - läuft immer
+  build-windows:
+    runs-on: windows-latest
     steps:
     - uses: actions/checkout@v4
 
@@ -33,21 +28,83 @@ jobs:
         cache: maven
 
     - name: Build with Maven
-      run: mvn -B compile "-Dswt.artifactId=${{ matrix.swt-artifact }}" --file pom.xml
+      run: mvn -B compile "-Dswt.artifactId=org.eclipse.swt.win32.win32.x86_64" --file pom.xml
       shell: bash
 
     - name: Run tests
-      run: mvn -B test "-Dswt.artifactId=${{ matrix.swt-artifact }}" --file pom.xml
+      run: mvn -B test "-Dswt.artifactId=org.eclipse.swt.win32.win32.x86_64" --file pom.xml
       shell: bash
       continue-on-error: true
 
     - name: Package
-      run: mvn -B package -DskipTests "-Dswt.artifactId=${{ matrix.swt-artifact }}" --file pom.xml
+      run: mvn -B package -DskipTests "-Dswt.artifactId=org.eclipse.swt.win32.win32.x86_64" --file pom.xml
       shell: bash
 
     - name: Upload artifact
       uses: actions/upload-artifact@v4
       with:
-        name: badpeggy-${{ matrix.os }}
+        name: badpeggy-windows
+        path: target/*.jar
+        retention-days: 30
+
+  # Linux Build - nur bei manuellem Trigger mit all_platforms=true
+  build-linux:
+    if: github.event_name == 'workflow_dispatch' && inputs.all_platforms
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up JDK 17
+      uses: actions/setup-java@v4
+      with:
+        java-version: '17'
+        distribution: 'temurin'
+        cache: maven
+
+    - name: Build with Maven
+      run: mvn -B compile "-Dswt.artifactId=org.eclipse.swt.gtk.linux.x86_64" --file pom.xml
+
+    - name: Run tests
+      run: mvn -B test "-Dswt.artifactId=org.eclipse.swt.gtk.linux.x86_64" --file pom.xml
+      continue-on-error: true
+
+    - name: Package
+      run: mvn -B package -DskipTests "-Dswt.artifactId=org.eclipse.swt.gtk.linux.x86_64" --file pom.xml
+
+    - name: Upload artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: badpeggy-linux
+        path: target/*.jar
+        retention-days: 30
+
+  # macOS Build - nur bei manuellem Trigger mit all_platforms=true
+  build-macos:
+    if: github.event_name == 'workflow_dispatch' && inputs.all_platforms
+    runs-on: macos-latest
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up JDK 17
+      uses: actions/setup-java@v4
+      with:
+        java-version: '17'
+        distribution: 'temurin'
+        cache: maven
+
+    - name: Build with Maven
+      run: mvn -B compile "-Dswt.artifactId=org.eclipse.swt.cocoa.macosx.aarch64" --file pom.xml
+
+    - name: Run tests
+      run: mvn -B test "-Dswt.artifactId=org.eclipse.swt.cocoa.macosx.aarch64" --file pom.xml
+      continue-on-error: true
+
+    - name: Package
+      run: mvn -B package -DskipTests "-Dswt.artifactId=org.eclipse.swt.cocoa.macosx.aarch64" --file pom.xml
+
+    - name: Upload artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: badpeggy-macos
         path: target/*.jar
         retention-days: 30
