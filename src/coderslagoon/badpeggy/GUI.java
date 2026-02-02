@@ -69,6 +69,8 @@ import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Text;
+import org.eclipse.swt.widgets.ToolBar;
+import org.eclipse.swt.widgets.ToolItem;
 
 import coderslagoon.badpeggy.scanner.ImageFormat;
 import coderslagoon.badpeggy.scanner.ImageScanner;
@@ -95,7 +97,7 @@ import com.coderslagoon.baselib.util.VarRef;
 public class GUI implements Runnable, NLS.Reg.Listener {
     final static String PROPERTIES = "badpeggy";
 
-    final static String VERSION = "2.4";
+    final static String VERSION = "2.4.1";
 
     final static int DLG_GAP = 10;
 
@@ -150,6 +152,13 @@ public class GUI implements Runnable, NLS.Reg.Listener {
     MenuItem    mniClear;
     Menu        popupMenu;
     Menu        mainMenu;
+
+    ToolBar     toolBar;
+    ToolItem    tbiScan;
+    ToolItem    tbiDelete;
+    ToolItem    tbiMove;
+    ToolItem    tbiOpenFolder;
+    ToolItem    tbiClear;
 
     Composite    splitterLand;
     Splitter     splitter;
@@ -267,6 +276,29 @@ public class GUI implements Runnable, NLS.Reg.Listener {
         this.mniAbout = new MenuItem(mn1, SWT.NONE);
         this.mniAbout.addListener(SWT.Selection, this.onAbout);
 
+        // Toolbar
+        this.toolBar = new ToolBar(this.shell, SWT.FLAT | SWT.WRAP);
+        this.toolBar.setLayoutData(new GridData(GridData.HORIZONTAL_ALIGN_FILL | GridData.GRAB_HORIZONTAL));
+
+        this.tbiScan = new ToolItem(this.toolBar, SWT.PUSH);
+        this.tbiScan.addListener(SWT.Selection, this.onScan);
+
+        new ToolItem(this.toolBar, SWT.SEPARATOR);
+
+        this.tbiDelete = new ToolItem(this.toolBar, SWT.PUSH);
+        this.tbiDelete.addListener(SWT.Selection, this.onDelete);
+
+        this.tbiMove = new ToolItem(this.toolBar, SWT.PUSH);
+        this.tbiMove.addListener(SWT.Selection, this.onMove);
+
+        this.tbiOpenFolder = new ToolItem(this.toolBar, SWT.PUSH);
+        this.tbiOpenFolder.addListener(SWT.Selection, this.onOpenFolder);
+
+        new ToolItem(this.toolBar, SWT.SEPARATOR);
+
+        this.tbiClear = new ToolItem(this.toolBar, SWT.PUSH);
+        this.tbiClear.addListener(SWT.Selection, this.onClear);
+
         this.splitterLand = new Composite(this.shell, SWT.FILL);
 
         this.splitter = new Splitter(this.splitterLand, true);
@@ -307,6 +339,7 @@ public class GUI implements Runnable, NLS.Reg.Listener {
         this.badLst.addListener(SWT.SetData  , this.onSetData);
         this.badLst.addListener(SWT.Selection, this.onSelected);
         this.badLst.addListener(SWT.KeyUp    , this.onBadLstKey);
+        this.badLst.addListener(SWT.EraseItem, this.onEraseItem);
         this.badLst.addMouseListener(          this.onFileOpen);
         this.badLst.setMenu(this.popupMenu);
         this.badLst.getMenu().addMenuListener(this.onPopupMenu);
@@ -407,6 +440,16 @@ public class GUI implements Runnable, NLS.Reg.Listener {
         this.info             .setText(NLS.GUI_MSG_WELCOME           .s());
         this.colFile          .setText(NLS.GUI_COL_FILE              .s());
         this.colReason        .setText(NLS.GUI_COL_REASON            .s());
+        this.tbiScan          .setText(NLS.GUI_TB_SCAN               .s());
+        this.tbiScan          .setToolTipText(NLS.GUI_TB_SCAN_TIP    .s());
+        this.tbiDelete        .setText(NLS.GUI_TB_DELETE             .s());
+        this.tbiDelete        .setToolTipText(NLS.GUI_TB_DELETE_TIP  .s());
+        this.tbiMove          .setText(NLS.GUI_TB_MOVE               .s());
+        this.tbiMove          .setToolTipText(NLS.GUI_TB_MOVE_TIP    .s());
+        this.tbiOpenFolder    .setText(NLS.GUI_TB_OPENFOLDER         .s());
+        this.tbiOpenFolder    .setToolTipText(NLS.GUI_TB_OPENFOLDER_TIP.s());
+        this.tbiClear         .setText(NLS.GUI_TB_CLEAR              .s());
+        this.tbiClear         .setToolTipText(NLS.GUI_TB_CLEAR_TIP   .s());
     }
 
     public void run() {
@@ -491,15 +534,74 @@ public class GUI implements Runnable, NLS.Reg.Listener {
 
     Listener onAbout = new Safe.Listener() {
         protected void unsafeHandleEvent(Event evt) {
-            About dlg = new About(GUI.this.shell, Prp.global(),
-                    NLS.GUI_ABOUT_CAPTION.s(),
-                    String.format(NLS.GUI_ABOUT_PRODUCT_1.s(), VERSION),
-                    NLS.GUI_ABOUT_INTRO.s(),
-                    String.format(NLS.GUI_ABOUT_COPYRIGHT_1.s(),
-                        MiscUtils.copyrightYear(2005, Calendar.getInstance())),
-                    GUI.class.getResourceAsStream("resources/icon48x48.png"),
-                    GUI.this.display.getSystemColor(SWT.COLOR_DARK_GRAY));
-                dlg.open();
+            final Shell dlg = new Shell(GUI.this.shell, SWT.DIALOG_TRIM | SWT.APPLICATION_MODAL);
+            dlg.setText(NLS.GUI_ABOUT_CAPTION.s());
+            dlg.setLayout(new GridLayout(1, false));
+
+            // Logo (256x256)
+            Canvas logoCanvas = new Canvas(dlg, SWT.NO_BACKGROUND);
+            Image logo = new Image(GUI.this.display,
+                    GUI.class.getResourceAsStream("resources/icon256x256.png"));
+            GridData gd = new GridData(GridData.HORIZONTAL_ALIGN_CENTER);
+            gd.widthHint = 128;
+            gd.heightHint = 128;
+            logoCanvas.setLayoutData(gd);
+            logoCanvas.addListener(SWT.Paint, e -> {
+                e.gc.setAntialias(SWT.ON);
+                e.gc.setInterpolation(SWT.HIGH);
+                e.gc.drawImage(logo, 0, 0, 256, 256, 0, 0, 128, 128);
+            });
+            logoCanvas.addListener(SWT.Dispose, e -> logo.dispose());
+
+            // Produktname und Version
+            Label lblProduct = new Label(dlg, SWT.CENTER);
+            lblProduct.setText(String.format(NLS.GUI_ABOUT_PRODUCT_1.s(), VERSION));
+            org.eclipse.swt.graphics.Font titleFont = new org.eclipse.swt.graphics.Font(GUI.this.display, "Arial", 16, SWT.BOLD);
+            lblProduct.setFont(titleFont);
+            lblProduct.setLayoutData(new GridData(GridData.HORIZONTAL_ALIGN_CENTER));
+            dlg.addListener(SWT.Dispose, e -> titleFont.dispose());
+
+            // Beschreibung
+            Label lblIntro = new Label(dlg, SWT.CENTER);
+            lblIntro.setText(NLS.GUI_ABOUT_INTRO.s());
+            lblIntro.setLayoutData(new GridData(GridData.HORIZONTAL_ALIGN_CENTER));
+
+            // Copyright
+            Label lblCopyright = new Label(dlg, SWT.CENTER);
+            lblCopyright.setText(String.format(NLS.GUI_ABOUT_COPYRIGHT_1.s(),
+                    MiscUtils.copyrightYear(2005, Calendar.getInstance())));
+            lblCopyright.setLayoutData(new GridData(GridData.HORIZONTAL_ALIGN_CENTER));
+
+            // Website-Link
+            Label lblWebsite = new Label(dlg, SWT.CENTER);
+            lblWebsite.setText(PRODUCT_SITE);
+            lblWebsite.setForeground(GUI.this.display.getSystemColor(SWT.COLOR_LINK_FOREGROUND));
+            lblWebsite.setCursor(GUI.this.display.getSystemCursor(SWT.CURSOR_HAND));
+            lblWebsite.setLayoutData(new GridData(GridData.HORIZONTAL_ALIGN_CENTER));
+            lblWebsite.addListener(SWT.MouseUp, e -> Program.launch(PRODUCT_SITE));
+
+            // Separator
+            Label sep = new Label(dlg, SWT.SEPARATOR | SWT.HORIZONTAL);
+            sep.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+
+            // OK Button
+            Button btnOK = new Button(dlg, SWT.PUSH);
+            btnOK.setText("OK");
+            gd = new GridData(GridData.HORIZONTAL_ALIGN_CENTER);
+            gd.widthHint = 80;
+            btnOK.setLayoutData(gd);
+            btnOK.addListener(SWT.Selection, e -> dlg.close());
+
+            dlg.setDefaultButton(btnOK);
+            dlg.pack();
+            // Zentrieren
+            Point size = dlg.getSize();
+            Point parentSize = GUI.this.shell.getSize();
+            Point parentLoc = GUI.this.shell.getLocation();
+            dlg.setLocation(
+                    parentLoc.x + (parentSize.x - size.x) / 2,
+                    parentLoc.y + (parentSize.y - size.y) / 2);
+            dlg.open();
         }
     };
 
@@ -678,11 +780,16 @@ public class GUI implements Runnable, NLS.Reg.Listener {
         int r =  v & 0x00000ff;
         int g = (v & 0x000ff00) >>  8;
         int b = (v & 0x0ff0000) >> 16;
-        int f = (r + g*2 + b) > (127 * 4) ? 0 : 255;
+        // Berechne Graustufe und helle sie auf (min 200, max 245 für bessere Lesbarkeit)
         int c = (int)(r * .299 + g * .587 + b * .114);
+        c = 200 + (c * 45 / 255); // Helleres Grau (200-245)
         ti.setBackground(getCachedColor((c << 16) | (c << 8) | c));
-        ti.setForeground(getCachedColor((f << 16) | (f << 8) | f));
+        ti.setForeground(getCachedColor(0)); // Schwarzer Text für Kontrast
     }
+
+    // Farben für Selektion und Hover
+    static final int SELECTION_GREEN = (144 << 16) | (238 << 8) | 144; // Helles Grün (#90EE90)
+    static final int HOVER_GREEN = (152 << 16) | (251 << 8) | 152;     // Helleres Grün (#98FB98)
 
     Listener onSetData = new Safe.Listener() {
         protected void unsafeHandleEvent(Event e) {
@@ -695,6 +802,23 @@ public class GUI implements Runnable, NLS.Reg.Listener {
             ti.setText(1, msg0);
             if (GUI.this.mniDifferentiate.getSelection()) {
                 differentiate(ti, msg0);
+            }
+        }
+    };
+
+    Listener onEraseItem = new Safe.Listener() {
+        protected void unsafeHandleEvent(Event e) {
+            if ((e.detail & SWT.SELECTED) != 0) {
+                // Benutzerdefinierte Selektionsfarbe (helles Grün)
+                e.gc.setBackground(getCachedColor(SELECTION_GREEN));
+                e.gc.fillRectangle(e.x, e.y, e.width, e.height);
+                e.detail &= ~SWT.SELECTED;
+            }
+            if ((e.detail & SWT.HOT) != 0) {
+                // Benutzerdefinierte Hover-Farbe (noch helleres Grün)
+                e.gc.setBackground(getCachedColor(HOVER_GREEN));
+                e.gc.fillRectangle(e.x, e.y, e.width, e.height);
+                e.detail &= ~SWT.HOT;
             }
         }
     };
@@ -1389,10 +1513,18 @@ public class GUI implements Runnable, NLS.Reg.Listener {
     public void enableControls(boolean flag) {
         this.mniScan.setText((flag ? NLS.GUI_MN_FILE_SCAN :
                                      NLS.GUI_MN_FILE_SCANABORT).s());
+        this.tbiScan.setText((flag ? NLS.GUI_TB_SCAN :
+                                     NLS.GUI_TB_ABORT).s());
+        this.tbiScan.setToolTipText((flag ? NLS.GUI_TB_SCAN_TIP :
+                                            NLS.GUI_TB_ABORT_TIP).s());
         this.mniExit          .setEnabled(flag);
         this.mniIncSubFolders .setEnabled(flag);
         this.mniUseAllCPUCores.setEnabled(flag);
         this.mniFileExts      .setEnabled(flag);
         this.mniLanguage      .setEnabled(flag);
+        this.tbiDelete        .setEnabled(flag);
+        this.tbiMove          .setEnabled(flag);
+        this.tbiOpenFolder    .setEnabled(flag);
+        this.tbiClear         .setEnabled(flag);
     }
 }
