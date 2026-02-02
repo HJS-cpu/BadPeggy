@@ -40,11 +40,73 @@ jobs:
       run: mvn -B package -DskipTests "-Dswt.artifactId=org.eclipse.swt.win32.win32.x86_64" --file pom.xml
       shell: bash
 
-    - name: Upload artifact
+    - name: Create custom JRE with jlink
+      shell: pwsh
+      run: |
+        Write-Host "Creating minimal JRE with jlink..."
+        $javaHome = $env:JAVA_HOME
+        $jlink = Join-Path $javaHome "bin\jlink.exe"
+
+        & $jlink `
+          --add-modules java.base,java.desktop,java.logging,java.prefs `
+          --strip-debug `
+          --no-man-pages `
+          --no-header-files `
+          --compress=zip-6 `
+          --output jre-custom
+
+        # Show size
+        $size = (Get-ChildItem -Path "jre-custom" -Recurse | Measure-Object -Property Length -Sum).Sum / 1MB
+        Write-Host "Custom JRE size: $([math]::Round($size, 1)) MB"
+
+    - name: Create release package
+      shell: pwsh
+      run: |
+        Write-Host "Creating release package..."
+
+        # Create release folder
+        New-Item -ItemType Directory -Path "release\Bad Peggy" -Force
+
+        # Copy JAR (standalone version with dependencies)
+        Copy-Item "target\badpeggy-*-standalone.jar" "release\Bad Peggy\badpeggy.jar"
+
+        # Copy custom JRE
+        Copy-Item -Path "jre-custom" -Destination "release\Bad Peggy\jre" -Recurse
+
+        # Copy additional files from etc folder
+        if (Test-Path "etc\images\badpeggy.ico") {
+          Copy-Item "etc\images\badpeggy.ico" "release\Bad Peggy\"
+        }
+
+        # Copy license and readme
+        Copy-Item "LICENSE" "release\Bad Peggy\LICENSE.txt" -ErrorAction SilentlyContinue
+        Copy-Item "README.md" "release\Bad Peggy\" -ErrorAction SilentlyContinue
+
+        # Create start script
+        @"
+        @echo off
+        cd /d "%~dp0"
+        start "" "jre\bin\javaw.exe" -jar badpeggy.jar
+        "@ | Out-File -FilePath "release\Bad Peggy\BadPeggy.cmd" -Encoding ASCII
+
+        # Show contents
+        Write-Host "`nRelease package contents:"
+        Get-ChildItem "release\Bad Peggy" -Recurse | Where-Object { !$_.PSIsContainer } |
+          Select-Object FullName, @{N='Size(KB)';E={[math]::Round($_.Length/1KB,1)}} |
+          Format-Table -AutoSize
+
+    - name: Upload JAR artifact
       uses: actions/upload-artifact@v4
       with:
-        name: badpeggy-windows
-        path: target/*.jar
+        name: badpeggy-jar
+        path: target/*-standalone.jar
+        retention-days: 30
+
+    - name: Upload release package
+      uses: actions/upload-artifact@v4
+      with:
+        name: BadPeggy-Windows-x64
+        path: release/Bad Peggy/
         retention-days: 30
 
   # Linux Build - nur bei manuellem Trigger mit all_platforms=true
@@ -71,11 +133,38 @@ jobs:
     - name: Package
       run: mvn -B package -DskipTests "-Dswt.artifactId=org.eclipse.swt.gtk.linux.x86_64" --file pom.xml
 
-    - name: Upload artifact
+    - name: Create custom JRE with jlink
+      run: |
+        echo "Creating minimal JRE with jlink..."
+        $JAVA_HOME/bin/jlink \
+          --add-modules java.base,java.desktop,java.logging,java.prefs \
+          --strip-debug \
+          --no-man-pages \
+          --no-header-files \
+          --compress=zip-6 \
+          --output jre-custom
+
+        echo "Custom JRE size: $(du -sh jre-custom | cut -f1)"
+
+    - name: Create release package
+      run: |
+        mkdir -p "release/Bad Peggy"
+        cp target/badpeggy-*-standalone.jar "release/Bad Peggy/badpeggy.jar"
+        cp -r jre-custom "release/Bad Peggy/jre"
+        cp LICENSE "release/Bad Peggy/LICENSE.txt" 2>/dev/null || true
+        cp README.md "release/Bad Peggy/" 2>/dev/null || true
+
+        # Create start script
+        echo '#!/bin/bash
+        cd "$(dirname "$0")"
+        ./jre/bin/java -jar badpeggy.jar' > "release/Bad Peggy/badpeggy.sh"
+        chmod +x "release/Bad Peggy/badpeggy.sh"
+
+    - name: Upload release package
       uses: actions/upload-artifact@v4
       with:
-        name: badpeggy-linux
-        path: target/*.jar
+        name: BadPeggy-Linux-x64
+        path: release/Bad Peggy/
         retention-days: 30
 
   # macOS Build - nur bei manuellem Trigger mit all_platforms=true
@@ -102,9 +191,36 @@ jobs:
     - name: Package
       run: mvn -B package -DskipTests "-Dswt.artifactId=org.eclipse.swt.cocoa.macosx.aarch64" --file pom.xml
 
-    - name: Upload artifact
+    - name: Create custom JRE with jlink
+      run: |
+        echo "Creating minimal JRE with jlink..."
+        $JAVA_HOME/bin/jlink \
+          --add-modules java.base,java.desktop,java.logging,java.prefs \
+          --strip-debug \
+          --no-man-pages \
+          --no-header-files \
+          --compress=zip-6 \
+          --output jre-custom
+
+        echo "Custom JRE size: $(du -sh jre-custom | cut -f1)"
+
+    - name: Create release package
+      run: |
+        mkdir -p "release/Bad Peggy"
+        cp target/badpeggy-*-standalone.jar "release/Bad Peggy/badpeggy.jar"
+        cp -r jre-custom "release/Bad Peggy/jre"
+        cp LICENSE "release/Bad Peggy/LICENSE.txt" 2>/dev/null || true
+        cp README.md "release/Bad Peggy/" 2>/dev/null || true
+
+        # Create start script
+        echo '#!/bin/bash
+        cd "$(dirname "$0")"
+        ./jre/bin/java -jar badpeggy.jar' > "release/Bad Peggy/badpeggy.sh"
+        chmod +x "release/Bad Peggy/badpeggy.sh"
+
+    - name: Upload release package
       uses: actions/upload-artifact@v4
       with:
-        name: badpeggy-macos
-        path: target/*.jar
+        name: BadPeggy-macOS-ARM64
+        path: release/Bad Peggy/
         retention-days: 30
