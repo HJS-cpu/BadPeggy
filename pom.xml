@@ -42,6 +42,12 @@
             <groupId>com.coderslagoon</groupId>
             <artifactId>baselib-swt</artifactId>
             <version>${baselib.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.eclipse.platform</groupId>
+                    <artifactId>*</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <!-- SWT - Platform specific (configurable via -Dswt.artifactId) -->
