@@ -26,6 +26,8 @@
         <maven.compiler.target>17</maven.compiler.target>
         <swt.version>3.130.0</swt.version>
         <swt.artifactId>org.eclipse.swt.win32.win32.x86_64</swt.artifactId>
+        <swt.os>win32</swt.os>
+        <swt.arch>x86_64</swt.arch>
         <baselib.version>1.0.2</baselib.version>
     </properties>
 
@@ -124,6 +126,10 @@
                             <transformers>
                                 <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
                                     <mainClass>coderslagoon.badpeggy.GUI</mainClass>
+                                    <manifestEntries>
+                                        <SWT-OS>${swt.os}</SWT-OS>
+                                        <SWT-Arch>${swt.arch}</SWT-Arch>
+                                    </manifestEntries>
                                 </transformer>
                             </transformers>
                             <shadedArtifactAttached>true</shadedArtifactAttached>
