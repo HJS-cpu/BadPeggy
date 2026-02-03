@@ -7,6 +7,11 @@ on:
     branches: [ main, master ]
   workflow_dispatch:
     inputs:
+      full_release:
+        description: 'Create full release package with custom JRE'
+        required: false
+        default: true
+        type: boolean
       all_platforms:
         description: 'Build for all platforms (Windows, Linux, macOS)'
         required: false
@@ -41,6 +46,7 @@ jobs:
       shell: bash
 
     - name: Create custom JRE with jlink
+      if: github.event_name == 'workflow_dispatch' && inputs.full_release
       shell: pwsh
       run: |
         Write-Host "Creating minimal JRE with jlink..."
@@ -60,6 +66,7 @@ jobs:
         Write-Host "Custom JRE size: $([math]::Round($size, 1)) MB"
 
     - name: Create release package
+      if: github.event_name == 'workflow_dispatch' && inputs.full_release
       shell: pwsh
       run: |
         Write-Host "Creating release package..."
@@ -77,16 +84,15 @@ jobs:
         Copy-Item "etc\images\badpeggy.ico" "release\Bad Peggy\" -ErrorAction SilentlyContinue
 
         # Copy install script
-        Copy-Item "install.vbs" "release\Bad Peggy\" -ErrorAction SilentlyContinue
+        Copy-Item "etc\scripts\install.vbs" "release\Bad Peggy\" -ErrorAction SilentlyContinue
 
         # Copy license
         Copy-Item "LICENSE.txt" "release\Bad Peggy\" -ErrorAction SilentlyContinue
 
-        # Copy all READMEs and docs
-        Copy-Item "README.txt" "release\Bad Peggy\" -ErrorAction SilentlyContinue
-        Copy-Item "LIESMICH.txt" "release\Bad Peggy\" -ErrorAction SilentlyContinue
-        Copy-Item "CTIMNE.txt" "release\Bad Peggy\" -ErrorAction SilentlyContinue
-        Copy-Item "etc\README.txt" "release\Bad Peggy\README_original.txt" -ErrorAction SilentlyContinue
+        # Copy all READMEs and docs from etc/
+        Copy-Item "etc\README.txt" "release\Bad Peggy\" -ErrorAction SilentlyContinue
+        Copy-Item "etc\LIESMICH.txt" "release\Bad Peggy\" -ErrorAction SilentlyContinue
+        Copy-Item "etc\CTIMNE.txt" "release\Bad Peggy\" -ErrorAction SilentlyContinue
 
         # Create start script
         @"
@@ -109,6 +115,7 @@ jobs:
         retention-days: 30
 
     - name: Upload release package
+      if: github.event_name == 'workflow_dispatch' && inputs.full_release
       uses: actions/upload-artifact@v4
       with:
         name: BadPeggy-Windows-x64
