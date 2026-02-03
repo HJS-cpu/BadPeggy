@@ -86,6 +86,7 @@ jobs:
         Copy-Item "README.md" "release\Bad Peggy\" -ErrorAction SilentlyContinue
         Copy-Item "README.txt" "release\Bad Peggy\" -ErrorAction SilentlyContinue
         Copy-Item "LIESMICH.txt" "release\Bad Peggy\" -ErrorAction SilentlyContinue
+        Copy-Item "CTIMNE.txt" "release\Bad Peggy\" -ErrorAction SilentlyContinue
         Copy-Item "etc\README.txt" "release\Bad Peggy\README_original.txt" -ErrorAction SilentlyContinue
 
         # Create start script
