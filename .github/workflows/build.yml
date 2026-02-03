@@ -83,7 +83,6 @@ jobs:
         Copy-Item "LICENSE.txt" "release\Bad Peggy\" -ErrorAction SilentlyContinue
 
         # Copy all READMEs and docs
-        Copy-Item "README.md" "release\Bad Peggy\" -ErrorAction SilentlyContinue
         Copy-Item "README.txt" "release\Bad Peggy\" -ErrorAction SilentlyContinue
         Copy-Item "LIESMICH.txt" "release\Bad Peggy\" -ErrorAction SilentlyContinue
         Copy-Item "CTIMNE.txt" "release\Bad Peggy\" -ErrorAction SilentlyContinue
