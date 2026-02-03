@@ -82,7 +82,7 @@ import com.coderslagoon.baselib.io.FileRegistrar.Callback.Merge;
 import com.coderslagoon.baselib.io.FileRegistrar.InMemory.DefCmp;
 import com.coderslagoon.baselib.swt.dialogs.About;
 import com.coderslagoon.baselib.swt.dialogs.LangDialog;
-import com.coderslagoon.baselib.swt.dialogs.MessageBox2;
+import org.eclipse.swt.widgets.MessageBox;
 import com.coderslagoon.baselib.swt.util.ImageViewer;
 import com.coderslagoon.baselib.swt.util.SWTUtil;
 import com.coderslagoon.baselib.swt.util.Safe;
@@ -470,8 +470,7 @@ public class GUI implements Runnable, NLS.Reg.Listener {
 
     public void run() {
         if (!ImageScanner.selfTest()) {
-            MessageBox2.standard(GUI.this.shell,
-                SWT.ICON_ERROR | SWT.OK,
+            showMessage(SWT.ICON_ERROR | SWT.OK,
                 NLS.GUI_STARTUP_NOSCANNER.s(),
                 NLS.GUI_STARTUP_ERROR.s());
             return;
@@ -499,8 +498,7 @@ public class GUI implements Runnable, NLS.Reg.Listener {
             Prp.global().store(faos, "");
         }
         catch (IOException ioe) {
-            MessageBox2.standard(GUI.this.shell,
-                SWT.ICON_WARNING | SWT.OK,
+            showMessage(SWT.ICON_WARNING | SWT.OK,
                 NLS.GUI_MSG_CFGSAVEERR_2.fmt(_propertiesFile.getAbsolutePath(), ioe.getMessage()),
                 NLS.GUI_DLG_GENERIC_WARNING.s());
         }
@@ -639,8 +637,7 @@ public class GUI implements Runnable, NLS.Reg.Listener {
     Listener onWebsite = new Safe.Listener() {
         protected void unsafeHandleEvent(Event evt) {
             if (!Program.launch(PRODUCT_SITE)) {
-                MessageBox2.standard(GUI.this.shell,
-                        SWT.ICON_WARNING | SWT.OK,
+                GUI.this.showMessage(SWT.ICON_WARNING | SWT.OK,
                         NLS.GUI_MSGBOX_WEBSITE_1.fmt(PRODUCT_SITE),
                         PRODUCT_NAME);
             }
@@ -759,8 +756,7 @@ public class GUI implements Runnable, NLS.Reg.Listener {
 
     void scheduleStop(boolean close) {
         if (this.scanning) {
-            if (SWT.YES == MessageBox2.standard(
-                GUI.this.shell,
+            if (SWT.YES == showMessage(
                 SWT.ICON_QUESTION | SWT.YES | SWT.NO,
                 NLS.GUI_DLG_ABORT_MSG.s(),
                 NLS.GUI_DLG_GENERIC_CONFIRM.s())) {
@@ -900,7 +896,7 @@ public class GUI implements Runnable, NLS.Reg.Listener {
                 if (0 == c) {
                     return;
                 }
-                if (SWT.YES == MessageBox2.standard(GUI.this.shell,
+                if (SWT.YES == GUI.this.showMessage(
                     SWT.ICON_QUESTION | SWT.YES | SWT.NO,
                     NLS.GUI_DLG_REM_MSG_1.fmt(c),
                     NLS.GUI_DLG_GENERIC_CONFIRM.s())) {
@@ -924,7 +920,7 @@ public class GUI implements Runnable, NLS.Reg.Listener {
             if (0 == c) {
                 return;
             }
-            if (SWT.YES != MessageBox2.standard(GUI.this.shell,
+            if (SWT.YES != GUI.this.showMessage(
                 SWT.ICON_WARNING | SWT.YES | SWT.NO,
                 NLS.GUI_DLG_DELETE_MSG_1.fmt(c),
                 NLS.GUI_DLG_GENERIC_CONFIRM.s())) {
@@ -945,8 +941,7 @@ public class GUI implements Runnable, NLS.Reg.Listener {
                 }
             }
             if (0 < errors) {
-                MessageBox2.standard(GUI.this.shell,
-                    SWT.ICON_WARNING | SWT.OK,
+                GUI.this.showMessage(SWT.ICON_WARNING | SWT.OK,
                     NLS.GUI_DLG_DELETE_NODELS_1.fmt(errors),
                     NLS.GUI_DLG_GENERIC_WARNING.s());
             }
@@ -985,8 +980,7 @@ public class GUI implements Runnable, NLS.Reg.Listener {
                 }
             }
             if (0 < errors) {
-                MessageBox2.standard(GUI.this.shell,
-                    SWT.ICON_WARNING | SWT.OK,
+                GUI.this.showMessage(SWT.ICON_WARNING | SWT.OK,
                     NLS.GUI_DLG_MOVE_NOMOVES_1.fmt(errors),
                     NLS.GUI_DLG_GENERIC_WARNING.s());
             }
@@ -1040,7 +1034,7 @@ public class GUI implements Runnable, NLS.Reg.Listener {
             if (0 == c) {
                 return;
             }
-            if (SWT.YES == MessageBox2.standard(GUI.this.shell,
+            if (SWT.YES == GUI.this.showMessage(
                 SWT.ICON_QUESTION | SWT.YES | SWT.NO,
                 NLS.GUI_DLG_REM_MSG_1.fmt(c),
                 NLS.GUI_DLG_GENERIC_CONFIRM.s())) {
@@ -1092,8 +1086,7 @@ public class GUI implements Runnable, NLS.Reg.Listener {
                 }
             }
             catch (IOException ioe) {
-                MessageBox2.standard(GUI.this.shell,
-                    SWT.ICON_ERROR | SWT.OK,
+                GUI.this.showMessage(SWT.ICON_ERROR | SWT.OK,
                     NLS.GUI_DLG_EXPLST_ERROR_1.fmt(ioe.getLocalizedMessage()),
                     NLS.GUI_DLG_GENERIC_WARNING.s());
             }
@@ -1226,8 +1219,7 @@ public class GUI implements Runnable, NLS.Reg.Listener {
         StringBuilder sb = new StringBuilder();
         sb.append(err.getClass().getName() + '\n' + err.getMessage() + '\n');
         sb.append(baos.toString());
-        MessageBox2.standard(GUI.this.shell,
-            SWT.ICON_ERROR | SWT.OK,
+        showMessage(SWT.ICON_ERROR | SWT.OK,
             sb.toString(),
             NLS.GUI_DLG_GENERIC_UNRECERR.s());
         System.exit(EXITCODE_UNRECERR);
@@ -1327,8 +1319,7 @@ public class GUI implements Runnable, NLS.Reg.Listener {
             }
             else {
                 this.info.setText(NLS.GUI_MSG_FAILED_SEARCH.s());
-                MessageBox2.standard(GUI.this.shell,
-                    SWT.ICON_ERROR | SWT.OK,
+                showMessage(SWT.ICON_ERROR | SWT.OK,
                     NLS.GUI_MSG_SEARCH_FAILED_1.fmt(ioe.getMessage()),
                     NLS.GUI_DLG_GENERIC_WARNING.s());
             }
@@ -1541,5 +1532,12 @@ public class GUI implements Runnable, NLS.Reg.Listener {
         this.tbiMove          .setEnabled(flag);
         this.tbiOpenFolder    .setEnabled(flag);
         this.tbiClear         .setEnabled(flag);
+    }
+
+    private int showMessage(int style, String message, String title) {
+        MessageBox mb = new MessageBox(this.shell, style);
+        mb.setMessage(message);
+        mb.setText(title);
+        return mb.open();
     }
 }
