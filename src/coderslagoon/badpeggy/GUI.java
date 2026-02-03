@@ -160,6 +160,14 @@ public class GUI implements Runnable, NLS.Reg.Listener {
     ToolItem    tbiOpenFolder;
     ToolItem    tbiClear;
 
+    // Toolbar icons
+    Image       iconPlay;
+    Image       iconStop;
+    Image       iconTrash;
+    Image       iconMove;
+    Image       iconFolder;
+    Image       iconClear;
+
     Composite    splitterLand;
     Splitter     splitter;
     ImageViewer  imgViewer;
@@ -276,27 +284,40 @@ public class GUI implements Runnable, NLS.Reg.Listener {
         this.mniAbout = new MenuItem(mn1, SWT.NONE);
         this.mniAbout.addListener(SWT.Selection, this.onAbout);
 
+        // Toolbar icons
+        this.iconPlay = new Image(this.display, getClass().getResourceAsStream("resources/icons/play.png"));
+        this.iconStop = new Image(this.display, getClass().getResourceAsStream("resources/icons/stop-circle.png"));
+        this.iconTrash = new Image(this.display, getClass().getResourceAsStream("resources/icons/trash-2.png"));
+        this.iconMove = new Image(this.display, getClass().getResourceAsStream("resources/icons/move.png"));
+        this.iconFolder = new Image(this.display, getClass().getResourceAsStream("resources/icons/folder.png"));
+        this.iconClear = new Image(this.display, getClass().getResourceAsStream("resources/icons/x-circle.png"));
+
         // Toolbar
         this.toolBar = new ToolBar(this.shell, SWT.FLAT | SWT.WRAP);
         this.toolBar.setLayoutData(new GridData(GridData.HORIZONTAL_ALIGN_FILL | GridData.GRAB_HORIZONTAL));
 
         this.tbiScan = new ToolItem(this.toolBar, SWT.PUSH);
+        this.tbiScan.setImage(this.iconPlay);
         this.tbiScan.addListener(SWT.Selection, this.onScan);
 
         new ToolItem(this.toolBar, SWT.SEPARATOR);
 
         this.tbiDelete = new ToolItem(this.toolBar, SWT.PUSH);
+        this.tbiDelete.setImage(this.iconTrash);
         this.tbiDelete.addListener(SWT.Selection, this.onDelete);
 
         this.tbiMove = new ToolItem(this.toolBar, SWT.PUSH);
+        this.tbiMove.setImage(this.iconMove);
         this.tbiMove.addListener(SWT.Selection, this.onMove);
 
         this.tbiOpenFolder = new ToolItem(this.toolBar, SWT.PUSH);
+        this.tbiOpenFolder.setImage(this.iconFolder);
         this.tbiOpenFolder.addListener(SWT.Selection, this.onOpenFolder);
 
         new ToolItem(this.toolBar, SWT.SEPARATOR);
 
         this.tbiClear = new ToolItem(this.toolBar, SWT.PUSH);
+        this.tbiClear.setImage(this.iconClear);
         this.tbiClear.addListener(SWT.Selection, this.onClear);
 
         this.splitterLand = new Composite(this.shell, SWT.FILL);
@@ -440,16 +461,11 @@ public class GUI implements Runnable, NLS.Reg.Listener {
         this.info             .setText(NLS.GUI_MSG_WELCOME           .s());
         this.colFile          .setText(NLS.GUI_COL_FILE              .s());
         this.colReason        .setText(NLS.GUI_COL_REASON            .s());
-        this.tbiScan          .setText(NLS.GUI_TB_SCAN               .s());
-        this.tbiScan          .setToolTipText(NLS.GUI_TB_SCAN_TIP    .s());
-        this.tbiDelete        .setText(NLS.GUI_TB_DELETE             .s());
-        this.tbiDelete        .setToolTipText(NLS.GUI_TB_DELETE_TIP  .s());
-        this.tbiMove          .setText(NLS.GUI_TB_MOVE               .s());
-        this.tbiMove          .setToolTipText(NLS.GUI_TB_MOVE_TIP    .s());
-        this.tbiOpenFolder    .setText(NLS.GUI_TB_OPENFOLDER         .s());
+        this.tbiScan          .setToolTipText(NLS.GUI_TB_SCAN_TIP      .s());
+        this.tbiDelete        .setToolTipText(NLS.GUI_TB_DELETE_TIP    .s());
+        this.tbiMove          .setToolTipText(NLS.GUI_TB_MOVE_TIP      .s());
         this.tbiOpenFolder    .setToolTipText(NLS.GUI_TB_OPENFOLDER_TIP.s());
-        this.tbiClear         .setText(NLS.GUI_TB_CLEAR              .s());
-        this.tbiClear         .setToolTipText(NLS.GUI_TB_CLEAR_TIP   .s());
+        this.tbiClear         .setToolTipText(NLS.GUI_TB_CLEAR_TIP     .s());
     }
 
     public void run() {
@@ -1513,8 +1529,7 @@ public class GUI implements Runnable, NLS.Reg.Listener {
     public void enableControls(boolean flag) {
         this.mniScan.setText((flag ? NLS.GUI_MN_FILE_SCAN :
                                      NLS.GUI_MN_FILE_SCANABORT).s());
-        this.tbiScan.setText((flag ? NLS.GUI_TB_SCAN :
-                                     NLS.GUI_TB_ABORT).s());
+        this.tbiScan.setImage(flag ? this.iconPlay : this.iconStop);
         this.tbiScan.setToolTipText((flag ? NLS.GUI_TB_SCAN_TIP :
                                             NLS.GUI_TB_ABORT_TIP).s());
         this.mniExit          .setEnabled(flag);
