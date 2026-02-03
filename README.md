@@ -3,8 +3,6 @@
 [![Build and Test](https://github.com/HJS-cpu/BadPeggy/actions/workflows/build.yml/badge.svg)](https://github.com/HJS-cpu/BadPeggy/actions/workflows/build.yml)
 [![Website](https://img.shields.io/badge/Website-BadPeggy-blue)](http://hjs.bplaced.net/BadPeggy)
 
-<img src="Bad Peggy.png" width="400" alt="Bad Peggy Screenshot">
-
 > **This is a fork of Bad Peggy by coderslagoon with additional features and improvements.**
 
 Bad Peggy scans JPEG and other image formats for damage and other blemishes and shows
