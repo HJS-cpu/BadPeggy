@@ -73,14 +73,20 @@ jobs:
         # Copy custom JRE
         Copy-Item -Path "jre-custom" -Destination "release\Bad Peggy\jre" -Recurse
 
-        # Copy additional files from etc folder
-        if (Test-Path "etc\images\badpeggy.ico") {
-          Copy-Item "etc\images\badpeggy.ico" "release\Bad Peggy\"
-        }
+        # Copy icon
+        Copy-Item "etc\images\badpeggy.ico" "release\Bad Peggy\" -ErrorAction SilentlyContinue
 
-        # Copy license and readme
-        Copy-Item "LICENSE" "release\Bad Peggy\LICENSE.txt" -ErrorAction SilentlyContinue
+        # Copy install script
+        Copy-Item "install.vbs" "release\Bad Peggy\" -ErrorAction SilentlyContinue
+
+        # Copy license
+        Copy-Item "LICENSE.txt" "release\Bad Peggy\" -ErrorAction SilentlyContinue
+
+        # Copy all READMEs and docs
         Copy-Item "README.md" "release\Bad Peggy\" -ErrorAction SilentlyContinue
+        Copy-Item "README.txt" "release\Bad Peggy\" -ErrorAction SilentlyContinue
+        Copy-Item "LIESMICH.txt" "release\Bad Peggy\" -ErrorAction SilentlyContinue
+        Copy-Item "etc\README.txt" "release\Bad Peggy\README_original.txt" -ErrorAction SilentlyContinue
 
         # Create start script
         @"
