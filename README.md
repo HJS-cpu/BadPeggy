@@ -15,20 +15,29 @@ Runs on Windows, macOS and Linux.
 
 ## Changes in this Fork
 
-### New Features
-- **Open Folder**: Right-click context menu option to open the file location
-- **File Selection**: When opening folder, the file is now highlighted/selected in Explorer (Windows) or Finder (macOS)
+### Version 2.4.1
+- **Toolbar**: Quick access buttons for Scan, Delete, Move, Open Folder, Clear
+- **Improved About Dialog**: Larger logo, clickable website link, centered layout
+- **Optimized Table Colors**: Lighter gray rows, green selection/hover effects
+- **Custom JRE**: Reduced release size from ~45 MB to ~15-20 MB using jlink
 
-### Improvements
+### Previous Improvements
+- **Open Folder with Selection**: File is highlighted in Explorer (Windows) or Finder (macOS)
 - Updated to **Java 17**
 - **Maven build system** for easier building
 - **GitHub Actions CI/CD**: Automatic builds for Windows, Linux, and macOS (ARM64)
-- Performance optimizations
-- Fixed signature file exclusion in shaded JAR
+- **Three languages**: English, German, Czech
 
 ## Download
 
-Pre-built binaries are available under [Releases](https://github.com/HJS-cpu/BadPeggy/releases) or as build artifacts from [GitHub Actions](https://github.com/HJS-cpu/BadPeggy/actions).
+Pre-built binaries are available from [GitHub Actions](https://github.com/HJS-cpu/BadPeggy/actions) (click on the latest successful build, then download `BadPeggy-Windows-x64` from Artifacts).
+
+The release package includes:
+- `badpeggy.jar` - Standalone JAR with all dependencies
+- `jre/` - Custom Java Runtime (~35 MB)
+- `install.vbs` - Creates desktop shortcut (Windows)
+- `BadPeggy.cmd` - Start script
+- Documentation in EN/DE/CZ
 
 ---
 
@@ -65,14 +74,22 @@ Frozen reference test material is not included, due to the huge size of it (3+GB
 
 ## Shipping
 
-For shipping clone the [jre-reduce](https://github.com/coderslagoon/jre-reduce)
-repo from GitHub, in parallel to the other projects. Download the appropriate JRE
-runtime files, as mentioned in the jre-reduce documentation. Then run *build.sh*
-and *build_macos.sh* to create the installer, passing them a version string.
+Release packages are built automatically via GitHub Actions:
+- **Windows**: Built on every push (default)
+- **All platforms**: Manual trigger with `all_platforms` option
+
+The workflow creates a complete release package with:
+- Standalone JAR (maven-shade-plugin)
+- Custom JRE via jlink (java.base, java.desktop, java.logging, java.prefs)
+- All documentation and install scripts
 
 ## I18N
 
-New user-facing strings need to be internationalized, meaning being available
-in both English and German. New strings have to be added in the NLS files in
-*coderslagoon.badpeggy.NLS...*. Please test for both languages, and watch out
-for proper format string rendering.
+Bad Peggy supports three languages: **English**, **German**, and **Czech**.
+
+New user-facing strings need to be added in all NLS files:
+- `NLS_en.properties` (English)
+- `NLS_de.properties` (German)
+- `NLS_cz.properties` (Czech)
+
+Please test all languages and watch out for proper format string rendering.
