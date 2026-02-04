@@ -139,7 +139,6 @@ public class GUI implements Runnable, NLS.Reg.Listener {
     Color       progressColor;
     boolean     indeterminate = false;
     double      indeterminatePos = 0.0;
-    boolean     indeterminateDir = true;
     Runnable    indeterminateTimer;
     DropTarget  drop;
     MenuItem    mniFile;
@@ -393,13 +392,14 @@ public class GUI implements Runnable, NLS.Reg.Listener {
                 Color bgColor = GUI.this.display.getSystemColor(SWT.COLOR_DARK_GRAY);
                 Color fgColor = GUI.this.display.getSystemColor(SWT.COLOR_WHITE);
                 if (GUI.this.indeterminate) {
-                    gc.setBackground(bgColor);
+                    double t = (Math.sin(GUI.this.indeterminatePos) + 1.0) / 2.0;
+                    int r = (int)(bgColor.getRed()   + t * (GUI.this.progressColor.getRed()   - bgColor.getRed()));
+                    int g = (int)(bgColor.getGreen() + t * (GUI.this.progressColor.getGreen() - bgColor.getGreen()));
+                    int b = (int)(bgColor.getBlue()  + t * (GUI.this.progressColor.getBlue()  - bgColor.getBlue()));
+                    Color pulseColor = new Color(GUI.this.display, r, g, b);
+                    gc.setBackground(pulseColor);
                     gc.fillRectangle(bounds);
-                    int blockWidth = Math.max(40, (int)(bounds.width * 0.2));
-                    int maxX = bounds.width - blockWidth;
-                    int blockX = (int)(maxX * GUI.this.indeterminatePos);
-                    gc.setBackground(GUI.this.progressColor);
-                    gc.fillRectangle(blockX, 0, blockWidth, bounds.height);
+                    pulseColor.dispose();
                 } else if (GUI.this.infoProgress > 0.0) {
                     int progressWidth = (int)(bounds.width * GUI.this.infoProgress);
                     gc.setBackground(GUI.this.progressColor);
@@ -1486,24 +1486,10 @@ public class GUI implements Runnable, NLS.Reg.Listener {
     void startIndeterminateAnimation() {
         this.indeterminate = true;
         this.indeterminatePos = 0.0;
-        this.indeterminateDir = true;
         this.indeterminateTimer = new Runnable() {
             public void run() {
                 if (!GUI.this.indeterminate || GUI.this.infoBar.isDisposed()) return;
-                double step = 0.01;
-                if (GUI.this.indeterminateDir) {
-                    GUI.this.indeterminatePos += step;
-                    if (GUI.this.indeterminatePos >= 1.0) {
-                        GUI.this.indeterminatePos = 1.0;
-                        GUI.this.indeterminateDir = false;
-                    }
-                } else {
-                    GUI.this.indeterminatePos -= step;
-                    if (GUI.this.indeterminatePos <= 0.0) {
-                        GUI.this.indeterminatePos = 0.0;
-                        GUI.this.indeterminateDir = true;
-                    }
-                }
+                GUI.this.indeterminatePos += 0.08;
                 GUI.this.infoBar.redraw();
                 GUI.this.display.timerExec(50, this);
             }
