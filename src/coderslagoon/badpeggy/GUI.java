@@ -396,10 +396,18 @@ public class GUI implements Runnable, NLS.Reg.Listener {
                     gc.setBackground(bgColor);
                     gc.fillRectangle(bounds);
                     int blockWidth = Math.max(40, (int)(bounds.width * 0.2));
+                    int fadeWidth = Math.max(10, blockWidth / 3);
                     int maxX = bounds.width - blockWidth;
                     int blockX = (int)(maxX * GUI.this.indeterminatePos);
+                    gc.setBackground(bgColor);
+                    gc.setForeground(GUI.this.progressColor);
+                    gc.fillGradientRectangle(blockX, 0, fadeWidth, bounds.height, false);
                     gc.setBackground(GUI.this.progressColor);
-                    gc.fillRectangle(blockX, 0, blockWidth, bounds.height);
+                    gc.fillRectangle(blockX + fadeWidth, 0,
+                            blockWidth - 2 * fadeWidth, bounds.height);
+                    gc.setForeground(bgColor);
+                    gc.fillGradientRectangle(blockX + blockWidth - fadeWidth, 0,
+                            fadeWidth, bounds.height, false);
                 } else if (GUI.this.infoProgress > 0.0) {
                     int progressWidth = (int)(bounds.width * GUI.this.infoProgress);
                     gc.setBackground(GUI.this.progressColor);
@@ -1489,7 +1497,7 @@ public class GUI implements Runnable, NLS.Reg.Listener {
         this.indeterminateTimer = new Runnable() {
             public void run() {
                 if (!GUI.this.indeterminate || GUI.this.infoBar.isDisposed()) return;
-                double step = 0.02;
+                double step = 0.01;
                 if (GUI.this.indeterminateDir) {
                     GUI.this.indeterminatePos += step;
                     if (GUI.this.indeterminatePos >= 1.0) {
@@ -1504,10 +1512,10 @@ public class GUI implements Runnable, NLS.Reg.Listener {
                     }
                 }
                 GUI.this.infoBar.redraw();
-                GUI.this.display.timerExec(30, this);
+                GUI.this.display.timerExec(50, this);
             }
         };
-        this.display.timerExec(30, this.indeterminateTimer);
+        this.display.timerExec(50, this.indeterminateTimer);
         this.infoBar.redraw();
     }
 
@@ -1590,7 +1598,7 @@ public class GUI implements Runnable, NLS.Reg.Listener {
 
     void search(FileRegistrar freg, FileSystem fs, FileNode dir, FileNode bottom,
                 boolean recursive) throws IOException {
-        setInfoText(NLS.GUI_MSG_SEARCHING_2.fmt(dir.name(), this.numOfFiles));
+        setInfoText(NLS.GUI_MSG_SEARCHING_2.fmt(this.numOfFiles));
         while (this.display.readAndDispatch()) {
             if (this.esc.get()) {
                 throw new IOException();
