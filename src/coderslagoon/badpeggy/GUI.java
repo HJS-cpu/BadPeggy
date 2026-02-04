@@ -635,14 +635,6 @@ public class GUI implements Runnable, NLS.Reg.Listener {
                     MiscUtils.copyrightYear(2005, Calendar.getInstance())));
             lblCopyright.setLayoutData(new GridData(GridData.HORIZONTAL_ALIGN_CENTER));
 
-            // Spacer (drückt OK-Button nach unten)
-            Label spacer = new Label(dlg, SWT.NONE);
-            spacer.setLayoutData(new GridData(GridData.FILL_BOTH));
-
-            // Separator
-            Label sep = new Label(dlg, SWT.SEPARATOR | SWT.HORIZONTAL);
-            sep.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-
             // OK Button
             Button btnOK = new Button(dlg, SWT.PUSH);
             btnOK.setText("OK");
