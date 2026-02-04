@@ -635,14 +635,6 @@ public class GUI implements Runnable, NLS.Reg.Listener {
                     MiscUtils.copyrightYear(2005, Calendar.getInstance())));
             lblCopyright.setLayoutData(new GridData(GridData.HORIZONTAL_ALIGN_CENTER));
 
-            // Website-Link
-            Label lblWebsite = new Label(dlg, SWT.CENTER);
-            lblWebsite.setText(PRODUCT_SITE);
-            lblWebsite.setForeground(GUI.this.display.getSystemColor(SWT.COLOR_LINK_FOREGROUND));
-            lblWebsite.setCursor(GUI.this.display.getSystemCursor(SWT.CURSOR_HAND));
-            lblWebsite.setLayoutData(new GridData(GridData.HORIZONTAL_ALIGN_CENTER));
-            lblWebsite.addListener(SWT.MouseUp, e -> Program.launch(PRODUCT_SITE));
-
             // Separator
             Label sep = new Label(dlg, SWT.SEPARATOR | SWT.HORIZONTAL);
             sep.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
