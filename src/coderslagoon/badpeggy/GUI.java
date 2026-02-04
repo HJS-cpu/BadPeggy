@@ -635,6 +635,9 @@ public class GUI implements Runnable, NLS.Reg.Listener {
                     MiscUtils.copyrightYear(2005, Calendar.getInstance())));
             lblCopyright.setLayoutData(new GridData(GridData.HORIZONTAL_ALIGN_CENTER));
 
+            // Leerzeile
+            new Label(dlg, SWT.NONE);
+
             // OK Button
             Button btnOK = new Button(dlg, SWT.PUSH);
             btnOK.setText("OK");
