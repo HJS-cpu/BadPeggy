@@ -601,6 +601,10 @@ public class GUI implements Runnable, NLS.Reg.Listener {
             dlg.setText(NLS.GUI_ABOUT_CAPTION.s());
             dlg.setLayout(new GridLayout(1, false));
 
+            // Spacer oben (vertikal zentrieren)
+            Label topSpacer = new Label(dlg, SWT.NONE);
+            topSpacer.setLayoutData(new GridData(GridData.FILL_BOTH));
+
             // Logo (256x256)
             Canvas logoCanvas = new Canvas(dlg, SWT.NO_BACKGROUND);
             Image logo = new Image(GUI.this.display,
@@ -635,8 +639,9 @@ public class GUI implements Runnable, NLS.Reg.Listener {
                     MiscUtils.copyrightYear(2005, Calendar.getInstance())));
             lblCopyright.setLayoutData(new GridData(GridData.HORIZONTAL_ALIGN_CENTER));
 
-            // Leerzeile
-            new Label(dlg, SWT.NONE);
+            // Spacer unten (vertikal zentrieren)
+            Label bottomSpacer = new Label(dlg, SWT.NONE);
+            bottomSpacer.setLayoutData(new GridData(GridData.FILL_BOTH));
 
             // OK Button
             Button btnOK = new Button(dlg, SWT.PUSH);
