@@ -45,9 +45,13 @@ import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.ShellEvent;
 import org.eclipse.swt.events.ShellListener;
+import org.eclipse.swt.events.PaintEvent;
+import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.layout.FormLayout;
@@ -129,7 +133,10 @@ public class GUI implements Runnable, NLS.Reg.Listener {
     Table       badLst;
     TableColumn colFile;
     TableColumn colReason;
-    Label       info;
+    Canvas      infoBar;
+    String      infoText = "";
+    double      infoProgress = 0.0;
+    Color       progressColor;
     DropTarget  drop;
     MenuItem    mniFile;
     MenuItem    mniScan;
@@ -373,11 +380,37 @@ public class GUI implements Runnable, NLS.Reg.Listener {
         int splitterPercent = GUIProps.SPLITTER_PERCENT.get();
         this.splitter.initialize(this.img, this.badLst, splitterPercent);
 
-        this.info = new Label(this.shell, SWT.BORDER);
-        this.info.setBackground(this.display.getSystemColor(SWT.COLOR_DARK_GRAY));
-        this.info.setForeground(this.display.getSystemColor(SWT.COLOR_WHITE));
-        this.info.setLayoutData(new GridData(
-                GridData.HORIZONTAL_ALIGN_FILL | GridData.GRAB_HORIZONTAL));
+        this.progressColor = new Color(this.display, 70, 130, 180);
+        this.infoBar = new Canvas(this.shell, SWT.BORDER | SWT.NO_BACKGROUND);
+        this.infoBar.addPaintListener(new PaintListener() {
+            public void paintControl(PaintEvent e) {
+                GC gc = e.gc;
+                Rectangle bounds = GUI.this.infoBar.getClientArea();
+                Color bgColor = GUI.this.display.getSystemColor(SWT.COLOR_DARK_GRAY);
+                Color fgColor = GUI.this.display.getSystemColor(SWT.COLOR_WHITE);
+                if (GUI.this.infoProgress > 0.0) {
+                    int progressWidth = (int)(bounds.width * GUI.this.infoProgress);
+                    gc.setBackground(GUI.this.progressColor);
+                    gc.fillRectangle(0, 0, progressWidth, bounds.height);
+                    gc.setBackground(bgColor);
+                    gc.fillRectangle(progressWidth, 0,
+                            bounds.width - progressWidth, bounds.height);
+                } else {
+                    gc.setBackground(bgColor);
+                    gc.fillRectangle(bounds);
+                }
+                gc.setForeground(fgColor);
+                String text = GUI.this.infoText;
+                if (text != null && !text.isEmpty()) {
+                    int textY = (bounds.height - gc.getFontMetrics().getHeight()) / 2;
+                    gc.drawText(text, 4, textY, true);
+                }
+            }
+        });
+        GridData infoGridData = new GridData(
+                GridData.HORIZONTAL_ALIGN_FILL | GridData.GRAB_HORIZONTAL);
+        infoGridData.heightHint = 20;
+        this.infoBar.setLayoutData(infoGridData);
 
         this.splitterLand.setLayoutData(new GridData(
                 GridData.HORIZONTAL_ALIGN_FILL | GridData.GRAB_HORIZONTAL |
@@ -458,7 +491,7 @@ public class GUI implements Runnable, NLS.Reg.Listener {
         this.mniClear         .setText(NLS.GUI_PMN_CLEAR             .s());
         this.mniSelectAll     .setText(NLS.GUI_PMN_SELECTALL         .s());
         this.mniExportList    .setText(NLS.GUI_PMN_EXPORTLIST        .s());
-        this.info             .setText(NLS.GUI_MSG_WELCOME           .s());
+        setInfoText(NLS.GUI_MSG_WELCOME.s());
         this.colFile          .setText(NLS.GUI_COL_FILE              .s());
         this.colReason        .setText(NLS.GUI_COL_REASON            .s());
         this.tbiScan          .setToolTipText(NLS.GUI_TB_SCAN_TIP      .s());
@@ -485,6 +518,9 @@ public class GUI implements Runnable, NLS.Reg.Listener {
             catch (Throwable err) {
                 SWTUtil.msgboxError(err, this.shell);
             }
+        }
+        if (this.progressColor != null && !this.progressColor.isDisposed()) {
+            this.progressColor.dispose();
         }
         this.shell.dispose();
         this.display.dispose();
@@ -1044,7 +1080,8 @@ public class GUI implements Runnable, NLS.Reg.Listener {
     };
     void clear(boolean clearInfo) {
         if (clearInfo) {
-            GUI.this.info.setText("");
+            setInfoText("");
+            setInfoProgress(0.0);
         }
         GUI.this.results.clear();
         GUI.this.resultTags.clear();
@@ -1274,7 +1311,8 @@ public class GUI implements Runnable, NLS.Reg.Listener {
     void scan1(String[] items) {
         this.esc.set(false);
         this.fatalErr = false;
-        this.info.setText(NLS.GUI_MSG_PRESSESC.s());
+        setInfoText(NLS.GUI_MSG_PRESSESC.s());
+        setInfoProgress(0.0);
         this.shell.setText(String.format("%s - %s", PRODUCT_NAME,
                 NLS.GUI_CAPTION_SEARCHING.s()));
         FileRegistrar freg = new FileRegistrar.InMemory(new DefCmp(true));
@@ -1315,10 +1353,12 @@ public class GUI implements Runnable, NLS.Reg.Listener {
         }
         catch (IOException ioe) {
             if (this.esc.get()) {
-                this.info.setText(NLS.GUI_MSG_ABORTED_SEARCH.s());
+                setInfoText(NLS.GUI_MSG_ABORTED_SEARCH.s());
+                setInfoProgress(0.0);
             }
             else {
-                this.info.setText(NLS.GUI_MSG_FAILED_SEARCH.s());
+                setInfoText(NLS.GUI_MSG_FAILED_SEARCH.s());
+                setInfoProgress(0.0);
                 showMessage(SWT.ICON_ERROR | SWT.OK,
                     NLS.GUI_MSG_SEARCH_FAILED_1.fmt(ioe.getMessage()),
                     NLS.GUI_DLG_GENERIC_WARNING.s());
@@ -1331,7 +1371,8 @@ public class GUI implements Runnable, NLS.Reg.Listener {
         this.damaged    = 0;
         boolean done = scanDirectory(freg.root());
         endExec();
-        this.info.setText((done ?
+        setInfoProgress(0.0);
+        setInfoText((done ?
             NLS.GUI_MSG_DONE        .s() :
             NLS.GUI_MSG_ABORTED_SCAN.s()) + ' ' +
             NLS.GUI_MSG_RESULT_3.fmt(this.scanned, this.damaged, this.unreadable));
@@ -1369,10 +1410,13 @@ public class GUI implements Runnable, NLS.Reg.Listener {
     void updateProgress(final String fpath) {
         this.display.syncExec(new Runnable() {
             public void run() {
-                GUI.this.info.setText(fpath);
                 GUI.this.scanned++;
                 double prct = (GUI.this.scanned * 100.0) /
                                GUI.this.numOfFiles;
+                GUI.this.infoText = fpath;
+                GUI.this.infoProgress = Math.max(0.0, Math.min(1.0, prct / 100.0));
+                GUI.this.infoBar.redraw();
+                GUI.this.infoBar.update();
                 if (GUI.this.lastPercentage < prct) {
                     GUI.this.shell.setText(String.format(
                             "%s - %.1f%%", PRODUCT_NAME,
@@ -1422,6 +1466,18 @@ public class GUI implements Runnable, NLS.Reg.Listener {
                 }
             }
         });
+    }
+
+    void setInfoText(String text) {
+        this.infoText = text;
+        this.infoBar.redraw();
+        this.infoBar.update();
+    }
+
+    void setInfoProgress(double progress) {
+        this.infoProgress = Math.max(0.0, Math.min(1.0, progress));
+        this.infoBar.redraw();
+        this.infoBar.update();
     }
 
     void updateFatal(final Throwable err) {
@@ -1484,7 +1540,7 @@ public class GUI implements Runnable, NLS.Reg.Listener {
 
     int search(FileRegistrar freg, FileSystem fs, FileNode dir, FileNode bottom,
                boolean recursive) throws IOException {
-        this.info.setText(NLS.GUI_MSG_SEARCHING_1.fmt(dir.name()));
+        setInfoText(NLS.GUI_MSG_SEARCHING_1.fmt(dir.name()));
         while (this.display.readAndDispatch()) {
             if (this.esc.get()) {
                 throw new IOException();
