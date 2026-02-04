@@ -45,6 +45,7 @@ public class NLS extends com.coderslagoon.baselib.util.NLS {
     public static Str GUI_MSG_WELCOME;
     public static Str GUI_MSG_PRESSESC;
     public static Str GUI_MSG_SEARCHING_1;
+    public static Str GUI_MSG_SEARCHING_2;
     public static Str GUI_MSG_SEARCH_FAILED_1;
     public static Str GUI_MSG_FAILED_SEARCH;
     public static Str GUI_MSG_ABORTED_SEARCH;

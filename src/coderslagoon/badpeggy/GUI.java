@@ -137,6 +137,10 @@ public class GUI implements Runnable, NLS.Reg.Listener {
     String      infoText = "";
     double      infoProgress = 0.0;
     Color       progressColor;
+    boolean     indeterminate = false;
+    double      indeterminatePos = 0.0;
+    boolean     indeterminateDir = true;
+    Runnable    indeterminateTimer;
     DropTarget  drop;
     MenuItem    mniFile;
     MenuItem    mniScan;
@@ -388,7 +392,15 @@ public class GUI implements Runnable, NLS.Reg.Listener {
                 Rectangle bounds = GUI.this.infoBar.getClientArea();
                 Color bgColor = GUI.this.display.getSystemColor(SWT.COLOR_DARK_GRAY);
                 Color fgColor = GUI.this.display.getSystemColor(SWT.COLOR_WHITE);
-                if (GUI.this.infoProgress > 0.0) {
+                if (GUI.this.indeterminate) {
+                    gc.setBackground(bgColor);
+                    gc.fillRectangle(bounds);
+                    int blockWidth = Math.max(40, (int)(bounds.width * 0.2));
+                    int maxX = bounds.width - blockWidth;
+                    int blockX = (int)(maxX * GUI.this.indeterminatePos);
+                    gc.setBackground(GUI.this.progressColor);
+                    gc.fillRectangle(blockX, 0, blockWidth, bounds.height);
+                } else if (GUI.this.infoProgress > 0.0) {
                     int progressWidth = (int)(bounds.width * GUI.this.infoProgress);
                     gc.setBackground(GUI.this.progressColor);
                     gc.fillRectangle(0, 0, progressWidth, bounds.height);
@@ -752,8 +764,7 @@ public class GUI implements Runnable, NLS.Reg.Listener {
     final static String DEFAULT_LANG_ID = "de";
     final static String[][] LANGS = new String[][] {
         { DEFAULT_LANG_ID, "Deutsch" },
-        { "en"           , "English" },
-        { "cz"           , "Český"   }
+        { "en"           , "English" }
     };
 
     Listener onLanguage = new Safe.Listener() {
@@ -1334,6 +1345,7 @@ public class GUI implements Runnable, NLS.Reg.Listener {
         };
         FileSystem fs = new LocalFileSystem(false);
         this.numOfFiles = 0;
+        startIndeterminateAnimation();
         try {
             FileRegistrar.Callback frcb = (nd0, nd1) ->  Merge.IGNORE;
             List<FileNode> files = new ArrayList<>();
@@ -1341,7 +1353,7 @@ public class GUI implements Runnable, NLS.Reg.Listener {
                 FileNode fn = fs.nodeFromString(item);
                 if (fn.hasAttributes(FileNode.ATTR_DIRECTORY)) {
                     boolean recursive = GUI.this.mniIncSubFolders.getSelection();
-                    this.numOfFiles += search(freg, fs, fn, fn, recursive);
+                    search(freg, fs, fn, fn, recursive);
                 }
                 else {
                     files.clear();
@@ -1352,6 +1364,7 @@ public class GUI implements Runnable, NLS.Reg.Listener {
             }
         }
         catch (IOException ioe) {
+            stopIndeterminateAnimation();
             if (this.esc.get()) {
                 setInfoText(NLS.GUI_MSG_ABORTED_SEARCH.s());
                 setInfoProgress(0.0);
@@ -1365,6 +1378,7 @@ public class GUI implements Runnable, NLS.Reg.Listener {
             }
             return;
         }
+        stopIndeterminateAnimation();
         //FileRegistrar.dump(freg.root(), 0, System.out);
         this.scanned    = 0;
         this.unreadable = 0;
@@ -1468,6 +1482,42 @@ public class GUI implements Runnable, NLS.Reg.Listener {
         });
     }
 
+    void startIndeterminateAnimation() {
+        this.indeterminate = true;
+        this.indeterminatePos = 0.0;
+        this.indeterminateDir = true;
+        this.indeterminateTimer = new Runnable() {
+            public void run() {
+                if (!GUI.this.indeterminate || GUI.this.infoBar.isDisposed()) return;
+                double step = 0.02;
+                if (GUI.this.indeterminateDir) {
+                    GUI.this.indeterminatePos += step;
+                    if (GUI.this.indeterminatePos >= 1.0) {
+                        GUI.this.indeterminatePos = 1.0;
+                        GUI.this.indeterminateDir = false;
+                    }
+                } else {
+                    GUI.this.indeterminatePos -= step;
+                    if (GUI.this.indeterminatePos <= 0.0) {
+                        GUI.this.indeterminatePos = 0.0;
+                        GUI.this.indeterminateDir = true;
+                    }
+                }
+                GUI.this.infoBar.redraw();
+                GUI.this.display.timerExec(30, this);
+            }
+        };
+        this.display.timerExec(30, this.indeterminateTimer);
+        this.infoBar.redraw();
+    }
+
+    void stopIndeterminateAnimation() {
+        this.indeterminate = false;
+        this.indeterminatePos = 0.0;
+        this.infoBar.redraw();
+        this.infoBar.update();
+    }
+
     void setInfoText(String text) {
         this.infoText = text;
         this.infoBar.redraw();
@@ -1538,9 +1588,9 @@ public class GUI implements Runnable, NLS.Reg.Listener {
         }
     }
 
-    int search(FileRegistrar freg, FileSystem fs, FileNode dir, FileNode bottom,
-               boolean recursive) throws IOException {
-        setInfoText(NLS.GUI_MSG_SEARCHING_1.fmt(dir.name()));
+    void search(FileRegistrar freg, FileSystem fs, FileNode dir, FileNode bottom,
+                boolean recursive) throws IOException {
+        setInfoText(NLS.GUI_MSG_SEARCHING_2.fmt(dir.name(), this.numOfFiles));
         while (this.display.readAndDispatch()) {
             if (this.esc.get()) {
                 throw new IOException();
@@ -1548,21 +1598,19 @@ public class GUI implements Runnable, NLS.Reg.Listener {
         }
         Iterator<FileNode> ifn = fs.list(dir, this.searchFilter);
         List<FileNode> files = new ArrayList<>();
-        int result = 0;
         while (ifn.hasNext()) {
             FileNode fn = ifn.next();
             if (fn.hasAttributes(FileNode.ATTR_DIRECTORY)) {
                 if (recursive) {
-                    result += search(freg, fs, fn, bottom, recursive);
+                    search(freg, fs, fn, bottom, recursive);
                 }
             }
             else {
                 files.add(fn);
-                result++;
+                this.numOfFiles++;
             }
         }
         freg.add(files, bottom, null, (nd0, nd1) -> Merge.IGNORE);
-        return result;
     }
 
     boolean addResult(ImageScanner.Result res) {
