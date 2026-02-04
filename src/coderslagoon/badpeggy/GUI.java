@@ -101,7 +101,7 @@ import com.coderslagoon.baselib.util.VarRef;
 public class GUI implements Runnable, NLS.Reg.Listener {
     final static String PROPERTIES = "badpeggy";
 
-    final static String VERSION = "2.4.1";
+    final static String VERSION = "2.4.2";
 
     final static int DLG_GAP = 10;
 

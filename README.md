@@ -13,6 +13,9 @@ Runs on Windows, macOS and Linux.
 
 ## Changes in this Fork
 
+### Version 2.4.2
+- **Progress Bar**: Status bar doubles as progress bar during scanning (Steel Blue fill)
+
 ### Version 2.4.1
 - **Toolbar**: Quick access buttons for Scan, Delete, Move, Open Folder, Clear
 - **Improved About Dialog**: Larger logo, clickable website link, centered layout
