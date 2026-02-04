@@ -649,8 +649,11 @@ public class GUI implements Runnable, NLS.Reg.Listener {
 
             dlg.setDefaultButton(btnOK);
             dlg.pack();
-            // Zentrieren
+            // Quadratisch machen
             Point size = dlg.getSize();
+            int side = Math.max(size.x, size.y);
+            dlg.setSize(side, side);
+            size = dlg.getSize();
             Point parentSize = GUI.this.shell.getSize();
             Point parentLoc = GUI.this.shell.getLocation();
             dlg.setLocation(
