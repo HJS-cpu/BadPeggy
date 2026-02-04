@@ -396,18 +396,10 @@ public class GUI implements Runnable, NLS.Reg.Listener {
                     gc.setBackground(bgColor);
                     gc.fillRectangle(bounds);
                     int blockWidth = Math.max(40, (int)(bounds.width * 0.2));
-                    int fadeWidth = Math.max(10, blockWidth / 3);
                     int maxX = bounds.width - blockWidth;
                     int blockX = (int)(maxX * GUI.this.indeterminatePos);
-                    gc.setBackground(bgColor);
-                    gc.setForeground(GUI.this.progressColor);
-                    gc.fillGradientRectangle(blockX, 0, fadeWidth, bounds.height, false);
                     gc.setBackground(GUI.this.progressColor);
-                    gc.fillRectangle(blockX + fadeWidth, 0,
-                            blockWidth - 2 * fadeWidth, bounds.height);
-                    gc.setForeground(bgColor);
-                    gc.fillGradientRectangle(blockX + blockWidth - fadeWidth, 0,
-                            fadeWidth, bounds.height, false);
+                    gc.fillRectangle(blockX, 0, blockWidth, bounds.height);
                 } else if (GUI.this.infoProgress > 0.0) {
                     int progressWidth = (int)(bounds.width * GUI.this.infoProgress);
                     gc.setBackground(GUI.this.progressColor);
@@ -529,6 +521,7 @@ public class GUI implements Runnable, NLS.Reg.Listener {
             return;
         }
         this.shell.open();
+        this.badLst.setFocus();
         while (!this.shell.isDisposed()) {
             try {
                 if (!this.display.readAndDispatch()) {
