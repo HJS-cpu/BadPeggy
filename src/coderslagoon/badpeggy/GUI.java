@@ -381,7 +381,7 @@ public class GUI implements Runnable, NLS.Reg.Listener {
         this.splitter.initialize(this.img, this.badLst, splitterPercent);
 
         this.progressColor = new Color(this.display, 70, 130, 180);
-        this.infoBar = new Canvas(this.shell, SWT.BORDER | SWT.NO_BACKGROUND);
+        this.infoBar = new Canvas(this.shell, SWT.BORDER | SWT.DOUBLE_BUFFERED);
         this.infoBar.addPaintListener(new PaintListener() {
             public void paintControl(PaintEvent e) {
                 GC gc = e.gc;
