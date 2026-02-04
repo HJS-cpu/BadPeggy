@@ -87,7 +87,7 @@ jobs:
         # Copy all READMEs and docs from etc/
         Copy-Item "etc\README.txt" "release\Bad Peggy\" -ErrorAction SilentlyContinue
         Copy-Item "etc\LIESMICH.txt" "release\Bad Peggy\" -ErrorAction SilentlyContinue
-        Copy-Item "etc\CTIMNE.txt" "release\Bad Peggy\" -ErrorAction SilentlyContinue
+        # Czech readme removed (see BackUps/CTIMNE.txt)
 
         # Create start script
         @"

@@ -27,7 +27,7 @@ Runs on Windows, macOS and Linux.
 - Updated to **Java 17**
 - **Maven build system** for easier building
 - **GitHub Actions CI/CD**: Automatic builds for Windows, Linux, and macOS (ARM64)
-- **Three languages**: English, German, Czech
+- **Two languages**: English, German
 
 ## Download
 
@@ -38,7 +38,7 @@ The release package includes:
 - `jre/` - Custom Java Runtime (~35 MB)
 - `install.vbs` - Creates desktop shortcut (Windows)
 - `BadPeggy.cmd` - Start script
-- Documentation in EN/DE/CZ
+- Documentation in EN/DE
 
 ---
 
@@ -86,11 +86,10 @@ The workflow creates a complete release package with:
 
 ## I18N
 
-Bad Peggy supports three languages: **English**, **German**, and **Czech**.
+Bad Peggy supports two languages: **English** and **German**.
 
 New user-facing strings need to be added in all NLS files:
 - `NLS_en.properties` (English)
 - `NLS_de.properties` (German)
-- `NLS_cz.properties` (Czech)
 
 Please test all languages and watch out for proper format string rendering.
