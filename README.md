@@ -14,19 +14,28 @@ Runs on Windows, macOS and Linux.
 ## Changes in this Fork
 
 ### Version 2.4.2
-- **Progress Bar**: Status bar doubles as progress bar during scanning (Steel Blue fill)
+- **Progress Bar in Status Bar**: The status bar now doubles as a progress bar during scanning
+  - *Phase 1 (File Search)*: Pulsating Steel Blue bar with live count of discovered files
+  - *Phase 2 (Scanning)*: Determinate progress bar that fills proportionally
+  - Flicker-free rendering with double buffering
+- **Toolbar with Icons**: New toolbar with Feather Icons (MIT License) for quick access
+  - Buttons: Scan, Stop, Delete, Move, Open Folder, Clear
+  - Play icon automatically switches to Stop during a scan
+  - Tooltips on mouse-over
+- **Redesigned About Dialog**: Square dialog with vertically centered content, two-line copyright
+- **Optimized Table Colors**: Lighter gray rows, green selection and hover effects
+- **Native MessageBox**: Replaced custom dialogs with native SWT MessageBox for correct button alignment
+- **Open Folder**: File is now highlighted in Explorer/Finder instead of just opening the folder
+- **Scan Button**: No longer focused/highlighted on startup
+- **Czech language removed**: Reduced to English and German (backup files in `BackUps/`)
 
 ### Version 2.4.1
-- **Toolbar**: Quick access buttons for Scan, Delete, Move, Open Folder, Clear
-- **Improved About Dialog**: Larger logo, clickable website link, centered layout
-- **Optimized Table Colors**: Lighter gray rows, green selection/hover effects
 - **Custom JRE**: Reduced release size from ~45 MB to ~15-20 MB using jlink
+- **GitHub Actions CI/CD**: Automatic builds with optional full release package
 
 ### Previous Improvements
-- **Open Folder with Selection**: File is highlighted in Explorer (Windows) or Finder (macOS)
 - Updated to **Java 17**
 - **Maven build system** for easier building
-- **GitHub Actions CI/CD**: Automatic builds for Windows, Linux, and macOS (ARM64)
 - **Two languages**: English, German
 
 ## Download
