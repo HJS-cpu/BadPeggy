@@ -50,6 +50,7 @@ import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.graphics.ImageData;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.FormAttachment;
@@ -567,12 +568,24 @@ public class GUI implements Runnable, NLS.Reg.Listener {
     }
 
     void setProgramIcon() {
-        this.shell.setImages(new Image[] {
-            new Image(this.display, getClass().getResourceAsStream("resources/icon16x16.png")),
-            new Image(this.display, getClass().getResourceAsStream("resources/icon32x32.png")),
-            new Image(this.display, getClass().getResourceAsStream("resources/icon48x48.png")),
-            new Image(this.display, getClass().getResourceAsStream("resources/icon256x256.png"))
-        });
+        String[] iconPaths = {
+            "resources/icon16x16.png",
+            "resources/icon32x32.png",
+            "resources/icon48x48.png",
+            "resources/icon256x256.png"
+        };
+        Image[] images = new Image[iconPaths.length];
+        for (int i = 0; i < iconPaths.length; i++) {
+            // Load image, then fix alpha channel in the DIB
+            Image temp = new Image(this.display, getClass().getResourceAsStream(iconPaths[i]));
+            ImageData data = temp.getImageData();
+            temp.dispose();
+            // Force all pixels to fully opaque (fixes SWT BITMAP→HICON black square)
+            data.alphaData = new byte[data.width * data.height];
+            java.util.Arrays.fill(data.alphaData, (byte) 255);
+            images[i] = new Image(this.display, data);
+        }
+        this.shell.setImages(images);
     }
 
     public static void main(String[] args) {
