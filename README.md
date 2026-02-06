@@ -1,5 +1,4 @@
-# Bad Peggy (Fork)
-
+# Bad Peggyhttps://github.com/HJS-cpu/BadPeggy/blob/master/README.md
 [![Build and Test](https://github.com/HJS-cpu/BadPeggy/actions/workflows/build.yml/badge.svg)](https://github.com/HJS-cpu/BadPeggy/actions/workflows/build.yml)
 [![Website](https://img.shields.io/badge/Website-BadPeggy-blue)](http://hjs.bplaced.net/BadPeggy)
 
