@@ -568,6 +568,8 @@ public class GUI implements Runnable, NLS.Reg.Listener {
 
     void setProgramIcon() {
         this.shell.setImages(new Image[] {
+            new Image(this.display, getClass().getResourceAsStream("resources/icon16x16.png")),
+            new Image(this.display, getClass().getResourceAsStream("resources/icon32x32.png")),
             new Image(this.display, getClass().getResourceAsStream("resources/icon48x48.png")),
             new Image(this.display, getClass().getResourceAsStream("resources/icon256x256.png"))
         });
