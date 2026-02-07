@@ -259,7 +259,7 @@ public class GUI implements Runnable, NLS.Reg.Listener {
         this.mniScan.addListener(SWT.Selection, this.onScan);
         new MenuItem(mn1, SWT.SEPARATOR);
         this.mniExit = new MenuItem(mn1, SWT.NONE);
-        this.mniExit.setAccelerator(SWT.MOD1 | (MiscUtils.underOSX() ? 'B' : 'Q'));
+        this.mniExit.setAccelerator(SWT.MOD1 | 'Q');
         this.mniExit.addListener(SWT.Selection, this.onExit);
 
         this.mniOpts = new MenuItem(mn0, SWT.CASCADE);
@@ -1061,23 +1061,9 @@ public class GUI implements Runnable, NLS.Reg.Listener {
             File fl = new File(res.tag.toString());
             if (fl.exists()) {
                 try {
-                    if (System.getProperty("os.name").toLowerCase().contains("win")) {
-                        // Windows: Open Explorer and select the file
-                        Runtime.getRuntime().exec(new String[] {
-                            "explorer", "/select,", fl.getAbsolutePath()
-                        });
-                    } else if (MiscUtils.underOSX()) {
-                        // macOS: Open Finder and select the file
-                        Runtime.getRuntime().exec(new String[] {
-                            "open", "-R", fl.getAbsolutePath()
-                        });
-                    } else {
-                        // Linux/other: Just open the parent folder
-                        File folder = fl.getParentFile();
-                        if (folder != null && folder.exists()) {
-                            Program.launch(folder.getAbsolutePath());
-                        }
-                    }
+                    Runtime.getRuntime().exec(new String[] {
+                        "explorer", "/select,", fl.getAbsolutePath()
+                    });
                 } catch (IOException ioe) {
                     // Fallback: open parent folder
                     File folder = fl.getParentFile();

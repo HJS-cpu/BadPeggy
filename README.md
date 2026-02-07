@@ -8,7 +8,7 @@ Bad Peggy scans JPEG and other image formats for damage and other blemishes and 
 the results and images instantly. It allows you to find such broken files quickly,
 inspect and then either delete or move them to a different location.
 
-Runs on Windows, macOS and Linux.
+Runs on Windows.
 
 ## Changes in this Fork
 
@@ -24,7 +24,7 @@ Runs on Windows, macOS and Linux.
 - **Redesigned About Dialog**: Square dialog with vertically centered content, two-line copyright
 - **Optimized Table Colors**: Lighter gray rows, green selection and hover effects
 - **Native MessageBox**: Replaced custom dialogs with native SWT MessageBox for correct button alignment
-- **Open Folder**: File is now highlighted in Explorer/Finder instead of just opening the folder
+- **Open Folder**: File is now highlighted in Explorer instead of just opening the folder
 - **Scan Button**: No longer focused/highlighted on startup
 - **Czech language removed**: Reduced to English and German (backup files in `BackUps/`)
 
@@ -62,10 +62,8 @@ mvn clean package -DskipTests
 mvn clean package -DskipTests -Dswt.artifactId=org.eclipse.swt.win32.win32.x86_64
 ```
 
-**Supported SWT artifacts:**
+**SWT artifact:**
 - Windows: `org.eclipse.swt.win32.win32.x86_64`
-- Linux: `org.eclipse.swt.gtk.linux.x86_64`
-- macOS (ARM): `org.eclipse.swt.cocoa.macosx.aarch64`
 
 ### Eclipse Development
 
@@ -84,8 +82,7 @@ Frozen reference test material is not included, due to the huge size of it (3+GB
 ## Shipping
 
 Release packages are built automatically via GitHub Actions:
-- **Windows**: Built on every push (default)
-- **All platforms**: Manual trigger with `all_platforms` option
+- **Windows**: Built on every push
 
 The workflow creates a complete release package with:
 - Standalone JAR (maven-shade-plugin)

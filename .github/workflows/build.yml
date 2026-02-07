@@ -12,11 +12,6 @@ on:
         required: false
         default: true
         type: boolean
-      all_platforms:
-        description: 'Build for all platforms (Windows, Linux, macOS)'
-        required: false
-        default: false
-        type: boolean
 
 jobs:
   # Windows Build - läuft immer
@@ -114,113 +109,5 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: BadPeggy-Windows-x64
-        path: release/Bad Peggy/
-        retention-days: 30
-
-  # Linux Build - nur bei manuellem Trigger mit all_platforms=true
-  build-linux:
-    if: github.event_name == 'workflow_dispatch' && inputs.all_platforms
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v4
-
-    - name: Set up JDK 17
-      uses: actions/setup-java@v4
-      with:
-        java-version: '17'
-        distribution: 'temurin'
-        cache: maven
-
-    - name: Build with Maven
-      run: mvn -B compile "-Dswt.artifactId=org.eclipse.swt.gtk.linux.x86_64" --file pom.xml
-
-    - name: Package
-      run: mvn -B package -DskipTests "-Dswt.artifactId=org.eclipse.swt.gtk.linux.x86_64" "-Dswt.os=linux" "-Dswt.arch=x86_64" --file pom.xml
-
-    - name: Create custom JRE with jlink
-      run: |
-        echo "Creating minimal JRE with jlink..."
-        $JAVA_HOME/bin/jlink \
-          --add-modules java.base,java.desktop,java.logging,java.prefs \
-          --strip-debug \
-          --no-man-pages \
-          --no-header-files \
-          --compress=2 \
-          --output jre-custom
-
-        echo "Custom JRE size: $(du -sh jre-custom | cut -f1)"
-
-    - name: Create release package
-      run: |
-        mkdir -p "release/Bad Peggy"
-        cp target/badpeggy-*-standalone.jar "release/Bad Peggy/badpeggy.jar"
-        cp -r jre-custom "release/Bad Peggy/jre"
-        cp LICENSE "release/Bad Peggy/LICENSE.txt" 2>/dev/null || true
-        cp README.md "release/Bad Peggy/" 2>/dev/null || true
-
-        # Create start script
-        echo '#!/bin/bash
-        cd "$(dirname "$0")"
-        ./jre/bin/java -jar badpeggy.jar' > "release/Bad Peggy/badpeggy.sh"
-        chmod +x "release/Bad Peggy/badpeggy.sh"
-
-    - name: Upload release package
-      uses: actions/upload-artifact@v4
-      with:
-        name: BadPeggy-Linux-x64
-        path: release/Bad Peggy/
-        retention-days: 30
-
-  # macOS Build - nur bei manuellem Trigger mit all_platforms=true
-  build-macos:
-    if: github.event_name == 'workflow_dispatch' && inputs.all_platforms
-    runs-on: macos-latest
-    steps:
-    - uses: actions/checkout@v4
-
-    - name: Set up JDK 17
-      uses: actions/setup-java@v4
-      with:
-        java-version: '17'
-        distribution: 'temurin'
-        cache: maven
-
-    - name: Build with Maven
-      run: mvn -B compile "-Dswt.artifactId=org.eclipse.swt.cocoa.macosx.aarch64" --file pom.xml
-
-    - name: Package
-      run: mvn -B package -DskipTests "-Dswt.artifactId=org.eclipse.swt.cocoa.macosx.aarch64" "-Dswt.os=macosx" "-Dswt.arch=aarch64" --file pom.xml
-
-    - name: Create custom JRE with jlink
-      run: |
-        echo "Creating minimal JRE with jlink..."
-        $JAVA_HOME/bin/jlink \
-          --add-modules java.base,java.desktop,java.logging,java.prefs \
-          --strip-debug \
-          --no-man-pages \
-          --no-header-files \
-          --compress=2 \
-          --output jre-custom
-
-        echo "Custom JRE size: $(du -sh jre-custom | cut -f1)"
-
-    - name: Create release package
-      run: |
-        mkdir -p "release/Bad Peggy"
-        cp target/badpeggy-*-standalone.jar "release/Bad Peggy/badpeggy.jar"
-        cp -r jre-custom "release/Bad Peggy/jre"
-        cp LICENSE "release/Bad Peggy/LICENSE.txt" 2>/dev/null || true
-        cp README.md "release/Bad Peggy/" 2>/dev/null || true
-
-        # Create start script
-        echo '#!/bin/bash
-        cd "$(dirname "$0")"
-        ./jre/bin/java -jar badpeggy.jar' > "release/Bad Peggy/badpeggy.sh"
-        chmod +x "release/Bad Peggy/badpeggy.sh"
-
-    - name: Upload release package
-      uses: actions/upload-artifact@v4
-      with:
-        name: BadPeggy-macOS-ARM64
         path: release/Bad Peggy/
         retention-days: 30
