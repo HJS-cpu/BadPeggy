@@ -21,6 +21,7 @@ Runs on Windows.
   - Buttons: Scan, Stop, Delete, Move, Open Folder, Clear
   - Play icon automatically switches to Stop during a scan
   - Tooltips on mouse-over
+- **Window Icon**: Application icon displayed in titlebar, taskbar and Alt+Tab (16/32/48/256px)
 - **Redesigned About Dialog**: Square dialog with vertically centered content, two-line copyright
 - **Optimized Table Colors**: Lighter gray rows, green selection and hover effects
 - **Native MessageBox**: Replaced custom dialogs with native SWT MessageBox for correct button alignment
