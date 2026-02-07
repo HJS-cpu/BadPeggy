@@ -26,7 +26,7 @@ Runs on Windows.
 - **Native MessageBox**: Replaced custom dialogs with native SWT MessageBox for correct button alignment
 - **Open Folder**: File is now highlighted in Explorer instead of just opening the folder
 - **Scan Button**: No longer focused/highlighted on startup
-- **Czech language removed**: Reduced to English and German (backup files in `BackUps/`)
+- **Czech language removed**: Reduced to English and German
 
 ### Version 2.4.1
 - **Custom JRE**: Reduced release size from ~45 MB to ~15-20 MB using jlink
