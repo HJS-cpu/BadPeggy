@@ -30,7 +30,7 @@ Runs on Windows.
 - **Czech language removed**: Reduced to English and German
 
 ### Version 2.4.1
-- **Custom JRE**: Reduced release size from ~45 MB to ~15-20 MB using jlink
+- **Custom JRE**: Reduced release size from ~45 MB to ~30 MB using jlink
 - **GitHub Actions CI/CD**: Automatic builds with optional full release package
 
 ### Previous Improvements
@@ -44,7 +44,7 @@ Pre-built binaries are available from [GitHub Actions](https://github.com/HJS-cp
 
 The release package includes:
 - `badpeggy.jar` - Standalone JAR with all dependencies
-- `jre/` - Custom Java Runtime (~35 MB)
+- `jre/` - Custom Java Runtime (~40 MB)
 - `install.vbs` - Creates desktop shortcut (Windows)
 - `BadPeggy.cmd` - Start script
 - Documentation in EN/DE
