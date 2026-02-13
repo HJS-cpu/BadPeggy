@@ -197,7 +197,7 @@ public class GUI implements Runnable, NLS.Reg.Listener {
     }
 
     final static String PRODUCT_NAME = "Bad Peggy";
-    public final static String PRODUCT_SITE = "http://hjs.bplaced.net/BadPeggy";
+    public final static String PRODUCT_SITE = "https://hjs.page.gd/BadPeggy/";
     
     final static int EXITCODE_UNRECERR = 1;
 
