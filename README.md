@@ -1,6 +1,6 @@
 # Bad Peggy
 [![Build and Test](https://github.com/HJS-cpu/BadPeggy/actions/workflows/build.yml/badge.svg)](https://github.com/HJS-cpu/BadPeggy/actions/workflows/build.yml)
-[![Website](https://img.shields.io/badge/Website-BadPeggy-blue)](https://hjs.page.gd/BadPeggy/)
+[![Website](https://img.shields.io/badge/Website-BadPeggy-blue)](https://hjs.page.gd/badpeggy/)
 
 > **This is a fork of Bad Peggy by coderslagoon with additional features and improvements.**
 
